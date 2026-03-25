@@ -1,0 +1,180 @@
+# =============================================================================
+# Visual Studio / Visual Studio Code
+# =============================================================================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# =============================================================================
+# .NET / C#
+# =============================================================================
+## Build outputs
+bin/
+obj/
+out/
+publish/
+
+## NuGet
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Rider
+.idea/
+*.DotSettings.user
+
+## Test results
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.coveragexml
+
+## ASP.NET
+App_Data/
+App_LocalResources/
+*_i.c
+*_p.c
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+## Publish profiles
+**/Properties/PublishProfiles/*.pubxml
+**/Properties/PublishProfiles/*.pubxml.user
+
+## Secrets / local config overrides (never commit these)
+appsettings.Local.json
+appsettings.Development.json
+secrets.json
+*.pfx
+*.snk
+
+# =============================================================================
+# Java / Maven
+# =============================================================================
+## Build outputs
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+## Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar
+
+## Logs
+*.log
+hs_err_pid*
+replay_pid*
+
+## IDE – IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+## IDE – Eclipse
+.classpath
+.project
+.settings/
+.factorypath
+
+## IDE – NetBeans
+nbproject/private/
+nbbuild/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# =============================================================================
+# Terraform
+# =============================================================================
+## Local state (never commit — use remote state instead)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+## Crash log
+crash.log
+crash.*.log
+
+## Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+## CLI config files
+.terraformrc
+terraform.rc
+
+## Provider plugins and lock file (re-downloaded by terraform init)
+.terraform/
+.terraform.lock.hcl
+
+## Sensitive variable files (use example files instead)
+terraform.tfvars
+*.auto.tfvars
+
+## Plan files
+*.tfplan
+
+# =============================================================================
+# OS / System
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# Secrets & credentials (belt-and-suspenders catch-all)
+# =============================================================================
+*.env
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12

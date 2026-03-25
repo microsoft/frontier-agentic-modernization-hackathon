@@ -1,0 +1,6 @@
+[submodule "dotnet/dotnet-migration-copilot-samples"]
+	path = dotnet/dotnet-migration-copilot-samples
+	url = https://github.com/Azure-Samples/dotnet-migration-copilot-samples.git
+[submodule "java/PhotoAlbum-Java"]
+	path = java/PhotoAlbum-Java
+	url = https://github.com/Azure-Samples/PhotoAlbum-Java.git

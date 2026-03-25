@@ -1,0 +1,48 @@
+{
+    "name": "PetClinic Modernization",
+    // Universal Ubuntu image ships with Java 21, Maven, Terraform, Azure CLI and Docker
+    // avoiding the Debian bookworm yarn-repo GPG key issue that breaks feature installs
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    // VS Code extensions pre-installed inside the container
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                // Java support
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-maven",
+                // GitHub Copilot
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                // Terraform
+                "hashicorp.terraform",
+                // Azure
+                "ms-azuretools.vscode-azureresourcegroups",
+                // Docker
+                "ms-azuretools.vscode-docker",
+                // Misc
+                "redhat.vscode-xml",
+                "vscjava.migrate-java-to-azure"
+            ],
+            "settings": {
+                "java.configuration.updateBuildConfiguration": "automatic",
+                "editor.formatOnSave": true,
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    },
+    // universal:2 image uses "codespace" as the default non-root user
+    "remoteUser": "codespace",
+    // Forward the port Jetty/Tomcat listens on
+    "forwardPorts": [
+        8080
+    ],
+    "portsAttributes": {
+        "8080": {
+            "label": "PetClinic",
+            "onAutoForward": "openBrowserOnce"
+        }
+    },
+    // Useful lifecycle commands
+    "postCreateCommand": "git submodule update --init --recursive && curl -fsSL https://raw.githubusercontent.com/microsoft/modernize-cli/main/scripts/install.sh | sh && source ~/.bashrc && mvn --version && terraform --version && az --version && modernize --version",
+    "mounts": []
+}
