@@ -1,0 +1,9 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# Do NOT commit terraform.tfvars to source control — it contains secrets.
+# Your current public IP is detected automatically by Terraform.
+
+prefix           = "wth"
+location         = "swedencentral"
+vm_size          = "Standard_D2s_v3"
+admin_username   = "azureadmin"
+admin_password   = "CHANGEMEComplex1!"   # must be 12+ chars, upper+lower+digit+special
