@@ -28,4 +28,10 @@ variable "admin_password" {
   sensitive   = true
 }
 
+variable "resource_group_name" {
+  type        = string
+  description = "Name of the Azure Resource Group to create."
+  default     = "wth-contoso-vm-rg"
+}
+
 

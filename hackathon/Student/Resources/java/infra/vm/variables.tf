@@ -27,3 +27,9 @@ variable "admin_password" {
   sensitive   = true
   description = "Password for the admin user. Must be 12+ characters with upper, lower, digit, and special character. No underscores."
 }
+
+variable "resource_group_name" {
+  type        = string
+  description = "Name of the Azure Resource Group to create."
+  default     = "wth-photoalbum-vm-rg"
+}

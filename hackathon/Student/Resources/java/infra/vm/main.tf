@@ -27,7 +27,7 @@ locals {
 
 # ── Resource Group ────────────────────────────────────────────────────────────
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.prefix}-photoalbum-vm-rg"
+  name     = var.resource_group_name
   location = var.location
 }
 
@@ -106,12 +106,12 @@ resource "azurerm_subnet_network_security_group_association" "subnet_nsg" {
 # Standard_D4s_v3 = 4 vCPU / 16 GB RAM
 # Oracle XE / Oracle Free needs at least 2 GB RAM — 16 GB gives comfortable headroom.
 resource "azurerm_linux_virtual_machine" "vm" {
-  name                = "${var.prefix}-photoalbum-vm"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  size                = var.vm_size
-  admin_username      = var.admin_username
-  admin_password      = var.admin_password
+  name                            = "${var.prefix}-photoalbum-vm"
+  resource_group_name             = azurerm_resource_group.rg.name
+  location                        = azurerm_resource_group.rg.location
+  size                            = var.vm_size
+  admin_username                  = var.admin_username
+  admin_password                  = var.admin_password
   disable_password_authentication = false
 
   network_interface_ids = [azurerm_network_interface.nic.id]

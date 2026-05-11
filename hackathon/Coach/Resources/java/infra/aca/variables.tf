@@ -38,3 +38,9 @@ variable "github_token" {
   sensitive   = true
   description = "GitHub Personal Access Token (PAT) with read:packages scope, used to pull the image from ghcr.io."
 }
+
+variable "resource_group_name" {
+  type        = string
+  description = "Name of the Azure Resource Group to create."
+  default     = "wth-photoalbum-aca-rg"
+}
