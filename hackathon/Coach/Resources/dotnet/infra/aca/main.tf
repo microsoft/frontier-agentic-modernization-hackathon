@@ -13,6 +13,10 @@ terraform {
       source  = "hashicorp/null"
       version = "~> 3.0"
     }
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.4"
+    }
   }
 }
 
@@ -22,6 +26,15 @@ provider "azurerm" {
 
 # ── Detect current deploying principal ───────────────────────────────────────
 data "azurerm_client_config" "current" {}
+
+# ── Detect public IP of the machine running `terraform apply` ────────────────
+data "http" "my_ip" {
+  url = "https://api.ipify.org"
+}
+
+locals {
+  deployer_ip = chomp(data.http.my_ip.response_body)
+}
 
 # ── Random suffix for globally-unique names ───────────────────────────────────
 resource "random_string" "suffix" {
@@ -73,6 +86,14 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   server_id        = azurerm_mssql_server.sql.id
   start_ip_address = "0.0.0.0"
   end_ip_address   = "0.0.0.0"
+}
+
+# Allow the deploying machine's public IP so the local-exec sqlcmd can connect
+resource "azurerm_mssql_firewall_rule" "allow_deployer_ip" {
+  name             = "allow-deployer-ip"
+  server_id        = azurerm_mssql_server.sql.id
+  start_ip_address = local.deployer_ip
+  end_ip_address   = local.deployer_ip
 }
 
 # ── Azure SQL Database ────────────────────────────────────────────────────────
@@ -206,6 +227,17 @@ resource "azurerm_container_app" "contoso" {
         value = azurerm_storage_container.teaching_materials.name
       }
 
+      # Azure OpenAI — passwordless via managed identity
+      env {
+        name  = "AzureOpenAI__Endpoint"
+        value = azurerm_cognitive_account.openai.endpoint
+      }
+
+      env {
+        name  = "AzureOpenAI__Deployment"
+        value = azurerm_cognitive_deployment.gpt41_mini.name
+      }
+
       env {
         name  = "ASPNETCORE_ENVIRONMENT"
         value = "Production"
@@ -248,6 +280,44 @@ resource "azurerm_role_assignment" "sb_data_owner" {
 resource "azurerm_role_assignment" "storage_blob_contributor" {
   scope                = azurerm_storage_account.sa.id
   role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_container_app.contoso.identity[0].principal_id
+}
+
+# ── Azure OpenAI account ──────────────────────────────────────────────────
+resource "azurerm_cognitive_account" "openai" {
+  name                  = "${var.prefix}-aoai-${local.suffix}"
+  location              = var.openai_location
+  resource_group_name   = azurerm_resource_group.rg.name
+  kind                  = "OpenAI"
+  sku_name              = "S0"
+  custom_subdomain_name = "${var.prefix}-aoai-${local.suffix}"
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+# ── gpt-4.1-mini model deployment ─────────────────────────────────────────────
+resource "azurerm_cognitive_deployment" "gpt41_mini" {
+  name                 = var.openai_deployment_name
+  cognitive_account_id = azurerm_cognitive_account.openai.id
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-4.1-mini"
+    version = var.openai_model_version
+  }
+
+  scale {
+    type     = "GlobalStandard"
+    capacity = var.openai_deployment_capacity
+  }
+}
+
+# ── RBAC: Cognitive Services OpenAI User → managed identity ──────────────────
+resource "azurerm_role_assignment" "aoai_user" {
+  scope                = azurerm_cognitive_account.openai.id
+  role_definition_name = "Cognitive Services OpenAI User"
   principal_id         = azurerm_container_app.contoso.identity[0].principal_id
 }
 
@@ -308,5 +378,6 @@ SQLEOF
   depends_on = [
     azurerm_mssql_database.contoso,
     azurerm_mssql_firewall_rule.allow_azure_services,
+    azurerm_mssql_firewall_rule.allow_deployer_ip,
   ]
 }

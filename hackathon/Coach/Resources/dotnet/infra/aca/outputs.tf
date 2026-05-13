@@ -37,3 +37,13 @@ output "resource_group_name" {
   description = "Name of the resource group."
   value       = azurerm_resource_group.rg.name
 }
+
+output "openai_endpoint" {
+  description = "Endpoint of the Azure OpenAI account (used as AzureOpenAI__Endpoint)."
+  value       = azurerm_cognitive_account.openai.endpoint
+}
+
+output "openai_deployment_name" {
+  description = "Name of the Azure OpenAI model deployment."
+  value       = azurerm_cognitive_deployment.gpt41_mini.name
+}
