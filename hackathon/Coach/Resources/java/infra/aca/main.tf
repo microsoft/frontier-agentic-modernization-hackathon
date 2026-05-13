@@ -190,6 +190,17 @@ resource "azurerm_container_app" "photoalbum" {
         name  = "AZURE_KEYVAULT_ENDPOINT"
         value = azurerm_key_vault.kv.vault_uri
       }
+
+      # Azure OpenAI — passwordless via managed identity
+      env {
+        name  = "AZURE_OPENAI_ENDPOINT"
+        value = azurerm_cognitive_account.openai.endpoint
+      }
+
+      env {
+        name  = "AZURE_OPENAI_DEPLOYMENT"
+        value = azurerm_cognitive_deployment.gpt41_mini.name
+      }
     }
 
     min_replicas = 1
@@ -216,5 +227,43 @@ resource "azurerm_key_vault_access_policy" "app" {
   object_id    = azurerm_container_app.photoalbum.identity[0].principal_id
 
   secret_permissions = ["Get", "List"]
+}
+
+# ── Azure OpenAI account ──────────────────────────────────────────────────
+resource "azurerm_cognitive_account" "openai" {
+  name                  = "${var.prefix}-aoai-${local.suffix}"
+  location              = var.openai_location
+  resource_group_name   = azurerm_resource_group.rg.name
+  kind                  = "OpenAI"
+  sku_name              = "S0"
+  custom_subdomain_name = "${var.prefix}-aoai-${local.suffix}"
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+# ── gpt-4.1-mini model deployment ─────────────────────────────────────────────
+resource "azurerm_cognitive_deployment" "gpt41_mini" {
+  name                 = var.openai_deployment_name
+  cognitive_account_id = azurerm_cognitive_account.openai.id
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-4.1-mini"
+    version = var.openai_model_version
+  }
+
+  scale {
+    type     = "GlobalStandard"
+    capacity = var.openai_deployment_capacity
+  }
+}
+
+# ── RBAC: Cognitive Services OpenAI User → managed identity ──────────────────
+resource "azurerm_role_assignment" "aoai_user" {
+  scope                = azurerm_cognitive_account.openai.id
+  role_definition_name = "Cognitive Services OpenAI User"
+  principal_id         = azurerm_container_app.photoalbum.identity[0].principal_id
 }
 

@@ -27,3 +27,13 @@ output "key_vault_uri" {
   description = "URI of the Azure Key Vault (value of AZURE_KEYVAULT_ENDPOINT)."
   value       = azurerm_key_vault.kv.vault_uri
 }
+
+output "openai_endpoint" {
+  description = "Endpoint of the Azure OpenAI account (used as AZURE_OPENAI_ENDPOINT)."
+  value       = azurerm_cognitive_account.openai.endpoint
+}
+
+output "openai_deployment_name" {
+  description = "Name of the Azure OpenAI model deployment (used as AZURE_OPENAI_DEPLOYMENT)."
+  value       = azurerm_cognitive_deployment.gpt41_mini.name
+}

@@ -54,5 +54,5 @@ variable "openai_model_version" {
 variable "openai_deployment_capacity" {
   type        = number
   description = "Capacity (TPM in thousands) for the model deployment."
-  default     = 5000
+  default     = 50
 }
