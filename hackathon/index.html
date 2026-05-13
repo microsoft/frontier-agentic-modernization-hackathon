@@ -39,6 +39,7 @@
             --dotnet-color: #8b5cf6;
             --deploy-color: #22c55e;
             --stretch-color: #f43f5e;
+            --ai-color: #f59e0b;
             --assess-color: #f5a623;
             --prereq-color: #6b7280;
 
@@ -669,20 +670,21 @@
             --c-color: var(--assess-color);
         }
 
+        /* Phase numbering is per-track: 02 = modernize, 03 = deploy, 04 = observe/secure, 05 = AI (stretch) */
         .challenge-card[data-phase="02"] {
             --c-color: var(--java-color);
         }
 
         .challenge-card[data-phase="03"] {
-            --c-color: var(--dotnet-color);
-        }
-
-        .challenge-card[data-phase="04"] {
             --c-color: var(--deploy-color);
         }
 
-        .challenge-card[data-phase="05"] {
+        .challenge-card[data-phase="04"] {
             --c-color: var(--stretch-color);
+        }
+
+        .challenge-card[data-phase="05"] {
+            --c-color: var(--ai-color);
         }
 
         .card-bg-number {
@@ -944,14 +946,22 @@
         }
 
         .stack-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: var(--radius);
-            background: var(--surface-2);
+            background: #fff;
             border: 1px solid var(--border);
             display: grid;
             place-items: center;
-            font-size: 1.1rem;
+            padding: 4px;
+        }
+
+        .stack-icon img,
+        .stack-icon svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
         .stack-name {
@@ -1473,7 +1483,7 @@
                 <div class="transform-pill">
                     <span class="from">.NET Framework 4.8</span>
                     <span class="arrow">→</span>
-                    <span class="to">.NET 9 ASP.NET Core</span>
+                    <span class="to">.NET 10 ASP.NET Core</span>
                 </div>
                 <div class="transform-pill">
                     <span class="from">Spring Boot 2.7 / Java 8</span>
@@ -1513,7 +1523,7 @@
     <!-- Stats -->
     <div id="stats">
         <div class="stat-item reveal">
-            <div class="stat-value display">1<span>0</span></div>
+            <div class="stat-value display">0<span>6</span></div>
             <div class="stat-label">Challenges</div>
         </div>
         <div class="stat-item reveal" style="transition-delay:.1s">
@@ -1549,7 +1559,7 @@
                 </div>
                 <div class="objective-item">
                     <span class="obj-num mono">03</span>
-                    <span>Migrate a .NET Framework 4.8 app to .NET 9 ASP.NET Core with Azure Service Bus and Blob
+                    <span>Migrate a .NET Framework 4.8 app to .NET 10 ASP.NET Core with Azure Service Bus and Blob
                         Storage</span>
                 </div>
                 <div class="objective-item">
@@ -1564,6 +1574,12 @@
                 <div class="objective-item">
                     <span class="obj-num mono">06</span>
                     <span>Harden with Application Insights, Key Vault, Managed Identity, and GitHub Actions CI/CD</span>
+                </div>
+                <div class="objective-item">
+                    <span class="obj-num mono">07</span>
+                    <span>Infuse Azure OpenAI vision (<code class="mono"
+                            style="color:var(--cyan);font-size:.8em">gpt-4.1-mini</code>) with Managed Identity to
+                        auto-generate metadata on upload <em style="opacity:.7">(stretch)</em></span>
                 </div>
             </div>
         </div>
@@ -1731,56 +1747,141 @@
         <p class="section-desc reveal">Services you'll provision and integrate during the hackathon.</p>
         <div class="stack-grid">
             <div class="stack-item reveal">
-                <div class="stack-icon">☁</div>
+                <div class="stack-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/benc-uk/icon-collection@master/azure-icons/Container-Instances.svg"
+                        alt="Azure Container Apps" loading="lazy" />
+                </div>
                 <div class="stack-name">Azure Container Apps</div>
                 <div class="stack-desc">Serverless container hosting with automatic scaling and built-in networking
                 </div>
                 <div class="stack-phase mono">CH 03 · 04</div>
             </div>
             <div class="stack-item reveal" style="transition-delay:.05s">
-                <div class="stack-icon">🐘</div>
+                <div class="stack-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/benc-uk/icon-collection@master/azure-icons/Azure-Database-PostgreSQL-Server.svg"
+                        alt="Azure Database for PostgreSQL" loading="lazy" />
+                </div>
                 <div class="stack-name">Azure DB for PostgreSQL</div>
                 <div class="stack-desc">Managed PostgreSQL Flexible Server — Oracle replacement for PhotoAlbum</div>
                 <div class="stack-phase mono">Java CH 02 · 03</div>
             </div>
             <div class="stack-item reveal" style="transition-delay:.1s">
-                <div class="stack-icon">💾</div>
+                <div class="stack-icon" aria-label="Azure SQL Database">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" role="img" aria-hidden="true">
+                        <defs>
+                            <radialGradient id="sqldb-b" cx="9.36" cy="10.57" r="7.07" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#f2f2f2" />
+                                <stop offset=".58" stop-color="#eee" />
+                                <stop offset="1" stop-color="#e6e6e6" />
+                            </radialGradient>
+                            <linearGradient id="sqldb-a" x1="2.59" y1="10.16" x2="15.41" y2="10.16"
+                                gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#005ba1" />
+                                <stop offset=".07" stop-color="#0060a9" />
+                                <stop offset=".36" stop-color="#0071c8" />
+                                <stop offset=".52" stop-color="#0078d4" />
+                                <stop offset=".64" stop-color="#0074cd" />
+                                <stop offset=".82" stop-color="#006abb" />
+                                <stop offset="1" stop-color="#005ba1" />
+                            </linearGradient>
+                        </defs>
+                        <path
+                            d="M9 5.14c-3.54 0-6.41-1-6.41-2.32v12.36c0 1.27 2.82 2.3 6.32 2.32H9c3.54 0 6.41-1 6.41-2.32V2.82c0 1.29-2.87 2.32-6.41 2.32z"
+                            fill="url(#sqldb-a)" />
+                        <path d="M15.41 2.82c0 1.29-2.87 2.32-6.41 2.32s-6.41-1-6.41-2.32S5.46.5 9 .5s6.41 1 6.41 2.32"
+                            fill="#e8e8e8" />
+                        <path
+                            d="M13.92 2.63c0 .82-2.21 1.48-4.92 1.48s-4.92-.66-4.92-1.48S6.29 1.16 9 1.16s4.92.66 4.92 1.47"
+                            fill="#50e6ff" />
+                        <path
+                            d="M9 3a11.55 11.55 0 00-3.89.57A11.42 11.42 0 009 4.11a11.15 11.15 0 003.89-.58A11.84 11.84 0 009 3z"
+                            fill="#198ab3" />
+                        <path
+                            d="M12.9 11.4V8H12v4.13h2.46v-.73zM5.76 9.73a1.83 1.83 0 01-.51-.31.44.44 0 01-.12-.32.34.34 0 01.15-.3.68.68 0 01.42-.12 1.62 1.62 0 011 .29v-.86a2.58 2.58 0 00-1-.16 1.64 1.64 0 00-1.09.34 1.08 1.08 0 00-.42.89c0 .51.32.91 1 1.21a2.88 2.88 0 01.62.36.42.42 0 01.15.32.38.38 0 01-.16.31.81.81 0 01-.45.11 1.66 1.66 0 01-1.09-.42V12a2.17 2.17 0 001.07.24 1.88 1.88 0 001.18-.33 1.08 1.08 0 00.33-.91 1.05 1.05 0 00-.25-.7 2.42 2.42 0 00-.83-.57zM11 11.32a2.34 2.34 0 00.33-1.26A2.32 2.32 0 0011 9a1.81 1.81 0 00-.7-.75 2 2 0 00-1-.26 2.11 2.11 0 00-1.08.27 1.86 1.86 0 00-.73.74 2.46 2.46 0 00-.26 1.14 2.26 2.26 0 00.24 1 1.76 1.76 0 00.69.74 2.06 2.06 0 001 .3l.86 1h1.21L10 12.08a1.79 1.79 0 001-.76zm-1-.25a.94.94 0 01-.76.35.92.92 0 01-.76-.36 1.52 1.52 0 01-.29-1 1.53 1.53 0 01.29-1 1 1 0 01.78-.37.87.87 0 01.75.37 1.62 1.62 0 01.27 1 1.46 1.46 0 01-.28 1.01z"
+                            fill="url(#sqldb-b)" />
+                    </svg>
+                </div>
                 <div class="stack-name">Azure SQL Database</div>
                 <div class="stack-desc">Fully managed relational database for ContosoUniversity with EF Core</div>
                 <div class="stack-phase mono">.NET CH 02 · 03</div>
             </div>
             <div class="stack-item reveal" style="transition-delay:.15s">
-                <div class="stack-icon">📦</div>
+                <div class="stack-icon" aria-label="Azure Blob Storage">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" role="img" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="stor-a" x1="9" y1="15.83" x2="9" y2="5.79"
+                                gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#b3b3b3" />
+                                <stop offset=".26" stop-color="#c1c1c1" />
+                                <stop offset="1" stop-color="#e6e6e6" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M.5 5.79h17v9.48a.57.57 0 01-.57.57H1.07a.57.57 0 01-.57-.57V5.79z"
+                            fill="url(#stor-a)" />
+                        <path d="M1.07 2.17h15.86a.57.57 0 01.57.57v3.05H.5V2.73a.57.57 0 01.57-.56z" fill="#37c2b1" />
+                        <path
+                            d="M2.81 6.89h12.37a.27.27 0 01.26.27v1.4a.27.27 0 01-.26.27H2.81a.27.27 0 01-.26-.27v-1.4a.27.27 0 01.26-.27z"
+                            fill="#fff" />
+                        <path
+                            d="M2.82 9.68h12.37a.27.27 0 01.26.27v1.41a.27.27 0 01-.26.27H2.82a.27.27 0 01-.26-.27V10a.27.27 0 01.26-.32z"
+                            fill="#37c2b1" />
+                        <path
+                            d="M2.82 12.5h12.37a.27.27 0 01.26.27v1.41a.27.27 0 01-.26.27H2.82a.27.27 0 01-.26-.27v-1.41a.27.27 0 01.26-.27z"
+                            fill="#258277" />
+                    </svg>
+                </div>
                 <div class="stack-name">Azure Blob Storage</div>
                 <div class="stack-desc">Object storage for photos and teaching materials — replaces file system and DB
                     BLOBs</div>
                 <div class="stack-phase mono">CH 02 · 03</div>
             </div>
             <div class="stack-item reveal" style="transition-delay:.2s">
-                <div class="stack-icon">📨</div>
+                <div class="stack-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/benc-uk/icon-collection@master/azure-icons/Service-Bus.svg"
+                        alt="Azure Service Bus" loading="lazy" />
+                </div>
                 <div class="stack-name">Azure Service Bus</div>
                 <div class="stack-desc">Cloud-native messaging — replaces MSMQ for the .NET notification service</div>
                 <div class="stack-phase mono">.NET CH 02 · 03</div>
             </div>
             <div class="stack-item reveal" style="transition-delay:.25s">
-                <div class="stack-icon">🔍</div>
+                <div class="stack-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/benc-uk/icon-collection@master/azure-icons/Application-Insights.svg"
+                        alt="Application Insights" loading="lazy" />
+                </div>
                 <div class="stack-name">Application Insights</div>
                 <div class="stack-desc">Distributed tracing, live metrics, and structured logging for both apps</div>
                 <div class="stack-phase mono">CH 04</div>
             </div>
             <div class="stack-item reveal" style="transition-delay:.3s">
-                <div class="stack-icon">🔑</div>
+                <div class="stack-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/benc-uk/icon-collection@master/azure-icons/Key-Vaults.svg"
+                        alt="Azure Key Vault" loading="lazy" />
+                </div>
                 <div class="stack-name">Azure Key Vault</div>
                 <div class="stack-desc">Centralised secret management — no connection strings in code or config files
                 </div>
                 <div class="stack-phase mono">CH 04</div>
             </div>
             <div class="stack-item reveal" style="transition-delay:.35s">
-                <div class="stack-icon">📋</div>
+                <div class="stack-icon">
+                    <img src="https://cdn.jsdelivr.net/gh/benc-uk/icon-collection@master/azure-icons/Container-Registries.svg"
+                        alt="Azure Container Registry" loading="lazy" />
+                </div>
                 <div class="stack-name">Container Registry</div>
                 <div class="stack-desc">Store and manage container images; integrated with Container Apps via Managed
                     Identity</div>
                 <div class="stack-phase mono">CH 03</div>
+            </div>
+            <div class="stack-item reveal" style="transition-delay:.4s">
+                <div class="stack-icon ai">
+                    <img src="https://cdn.jsdelivr.net/gh/benc-uk/icon-collection@master/azure-icons/Cognitive-Services.svg"
+                        alt="Azure OpenAI" loading="lazy" />
+                </div>
+                <div class="stack-name">Azure OpenAI</div>
+                <div class="stack-desc">Vision model <code class="mono" style="font-size:.9em">gpt-4.1-mini</code>
+                    called with Managed Identity to auto-generate captions, alt text, and tags</div>
+                <div class="stack-phase mono">CH 05</div>
             </div>
         </div>
     </section>
@@ -1904,7 +2005,7 @@
                 <a class="challenge-card half" data-phase="04" href="Student/java/Challenge-04.md">
                     <div class="card-bg-number display">04</div>
                     <div class="card-top">
-                        <span class="card-phase-badge">Stretch</span>
+                        <span class="card-phase-badge">Observe &amp; Secure</span>
                         <span class="card-num mono">CH — 04</span>
                     </div>
                     <h3 class="card-title display">Observe, Validate &amp; Secure</h3>
@@ -1919,6 +2020,30 @@
                             <span class="card-tag">Key Vault</span>
                             <span class="card-tag">Managed Identity</span>
                             <span class="card-tag">GitHub Actions</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Java CH-05 -->
+                <a class="challenge-card half" data-phase="05" href="Student/java/Challenge-05.md">
+                    <div class="card-bg-number display">05</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Stretch · AI</span>
+                        <span class="card-num mono">CH — 05</span>
+                    </div>
+                    <h3 class="card-title display">Infuse AI into PhotoAlbum</h3>
+                    <p class="card-desc">
+                        Call Azure OpenAI <code class="mono" style="font-size:.85em">gpt-4.1-mini</code> (vision)
+                        from the upload pipeline using Managed Identity to auto-generate captions, alt text,
+                        and tags for every photo.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">Azure OpenAI</span>
+                            <span class="card-tag">Vision</span>
+                            <span class="card-tag">Managed Identity</span>
+                            <span class="card-tag">Terraform</span>
                         </div>
                         <div class="card-arrow mono">Open <span>→</span></div>
                     </div>
@@ -1994,12 +2119,12 @@
                     </div>
                     <h3 class="card-title display">Modernize the .NET App</h3>
                     <p class="card-desc">
-                        Migrate ContosoUniversity from .NET Framework 4.8 / ASP.NET MVC 5 / MSMQ to .NET 9 / ASP.NET
+                        Migrate ContosoUniversity from .NET Framework 4.8 / ASP.NET MVC 5 / MSMQ to .NET 10 / ASP.NET
                         Core / Azure Service Bus + Blob Storage. Remove System.Web and convert to SDK-style csproj.
                     </p>
                     <div class="card-footer">
                         <div class="card-tags">
-                            <span class="card-tag">.NET 9</span>
+                            <span class="card-tag">.NET 10</span>
                             <span class="card-tag">ASP.NET Core</span>
                             <span class="card-tag">Service Bus</span>
                             <span class="card-tag">Blob Storage</span>
@@ -2035,7 +2160,7 @@
                 <a class="challenge-card half" data-phase="04" href="Student/dotnet/Challenge-04.md">
                     <div class="card-bg-number display">04</div>
                     <div class="card-top">
-                        <span class="card-phase-badge">Stretch</span>
+                        <span class="card-phase-badge">Observe &amp; Secure</span>
                         <span class="card-num mono">CH — 04</span>
                     </div>
                     <h3 class="card-title display">Observe, Validate &amp; Secure</h3>
@@ -2050,6 +2175,30 @@
                             <span class="card-tag">Key Vault</span>
                             <span class="card-tag">Managed Identity</span>
                             <span class="card-tag">GitHub Actions</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- .NET CH-05 -->
+                <a class="challenge-card half" data-phase="05" href="Student/dotnet/Challenge-05.md">
+                    <div class="card-bg-number display">05</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Stretch · AI</span>
+                        <span class="card-num mono">CH — 05</span>
+                    </div>
+                    <h3 class="card-title display">Infuse AI into ContosoUniversity</h3>
+                    <p class="card-desc">
+                        Call Azure OpenAI <code class="mono" style="font-size:.85em">gpt-4.1-mini</code> (vision)
+                        from the Course Create/Edit flow using Managed Identity to auto-suggest descriptions,
+                        learning objectives, and accessible alt text.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">Azure OpenAI</span>
+                            <span class="card-tag">Vision</span>
+                            <span class="card-tag">Managed Identity</span>
+                            <span class="card-tag">Terraform</span>
                         </div>
                         <div class="card-arrow mono">Open <span>→</span></div>
                     </div>
@@ -2173,10 +2322,10 @@
                 <a class="challenge-card half" data-phase="04" href="Coach/java/Challenge-04.md">
                     <div class="card-bg-number display">04</div>
                     <div class="card-top">
-                        <span class="card-phase-badge">Stretch</span>
+                        <span class="card-phase-badge">Observe &amp; Secure</span>
                         <span class="card-num mono">COACH — 04</span>
                     </div>
-                    <h3 class="card-title display">Stretch — Coach Notes</h3>
+                    <h3 class="card-title display">Observe &amp; Secure — Coach Notes</h3>
                     <p class="card-desc">
                         App Insights Java agent Dockerfile snippet, Key Vault + Managed Identity steps,
                         and GitHub Actions CI/CD coaching notes.
@@ -2185,6 +2334,29 @@
                         <div class="card-tags">
                             <span class="card-tag">observability</span>
                             <span class="card-tag">security</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Coach Java CH-05 -->
+                <a class="challenge-card half" data-phase="05" href="Coach/java/Challenge-05.md">
+                    <div class="card-bg-number display">05</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Stretch · AI</span>
+                        <span class="card-num mono">COACH — 05</span>
+                    </div>
+                    <h3 class="card-title display">Infuse AI — Coach Notes</h3>
+                    <p class="card-desc">
+                        Reference Terraform for Azure OpenAI + RBAC, <code class="mono"
+                            style="font-size:.85em">azure-ai-openai</code>
+                        snippets, common pitfalls table, and a working end-to-end implementation under
+                        <code class="mono" style="font-size:.85em">Coach/Resources/java/</code>.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">reference impl</span>
+                            <span class="card-tag">pitfalls</span>
                         </div>
                         <div class="card-arrow mono">Open <span>→</span></div>
                     </div>
@@ -2295,10 +2467,10 @@
                 <a class="challenge-card half" data-phase="04" href="Coach/dotnet/Challenge-04.md">
                     <div class="card-bg-number display">04</div>
                     <div class="card-top">
-                        <span class="card-phase-badge">Stretch</span>
+                        <span class="card-phase-badge">Observe &amp; Secure</span>
                         <span class="card-num mono">COACH — 04</span>
                     </div>
-                    <h3 class="card-title display">Stretch — Coach Notes</h3>
+                    <h3 class="card-title display">Observe &amp; Secure — Coach Notes</h3>
                     <p class="card-desc">
                         App Insights SDK setup, Key Vault + Managed Identity, and GitHub Actions CI/CD coaching
                         notes for the .NET track.
@@ -2307,6 +2479,29 @@
                         <div class="card-tags">
                             <span class="card-tag">observability</span>
                             <span class="card-tag">security</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Coach .NET CH-05 -->
+                <a class="challenge-card half" data-phase="05" href="Coach/dotnet/Challenge-05.md">
+                    <div class="card-bg-number display">05</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Stretch · AI</span>
+                        <span class="card-num mono">COACH — 05</span>
+                    </div>
+                    <h3 class="card-title display">Infuse AI — Coach Notes</h3>
+                    <p class="card-desc">
+                        Reference Terraform for Azure OpenAI + RBAC, <code class="mono"
+                            style="font-size:.85em">Azure.AI.OpenAI</code>
+                        snippets, common pitfalls table, and a working end-to-end implementation under
+                        <code class="mono" style="font-size:.85em">Coach/Resources/dotnet/</code>.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">reference impl</span>
+                            <span class="card-tag">pitfalls</span>
                         </div>
                         <div class="card-arrow mono">Open <span>→</span></div>
                     </div>
@@ -2326,11 +2521,13 @@
             <li><a href="Student/java/Challenge-02.md">Java CH-02</a></li>
             <li><a href="Student/java/Challenge-03.md">Java CH-03</a></li>
             <li><a href="Student/java/Challenge-04.md">Java CH-04</a></li>
+            <li><a href="Student/java/Challenge-05.md">Java CH-05</a></li>
             <li><a href="Student/dotnet/Challenge-00.md">.NET CH-00</a></li>
             <li><a href="Student/dotnet/Challenge-01.md">.NET CH-01</a></li>
             <li><a href="Student/dotnet/Challenge-02.md">.NET CH-02</a></li>
             <li><a href="Student/dotnet/Challenge-03.md">.NET CH-03</a></li>
             <li><a href="Student/dotnet/Challenge-04.md">.NET CH-04</a></li>
+            <li><a href="Student/dotnet/Challenge-05.md">.NET CH-05</a></li>
         </ul>
     </footer>
 

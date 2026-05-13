@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This challenge is the most technically complex in the .NET track. The migration from .NET Framework 4.8 to .NET 9 ASP.NET Core involves many breaking changes, and the `System.Web` dependency makes it impossible to do a simple in-place upgrade. The `modernize` tool significantly accelerates this but does not automate everything.
+This challenge is the most technically complex in the .NET track. The migration from .NET Framework 4.8 to .NET 10 ASP.NET Core involves many breaking changes, and the `System.Web` dependency makes it impossible to do a simple in-place upgrade. The `modernize` tool significantly accelerates this but does not automate everything.
 
 ## Mini-Lecture (10 min before challenge)
 
@@ -15,7 +15,7 @@ Cover:
 ## Suggested `modernize plan create` Goal
 
 ```
-Migrate ContosoUniversity from .NET Framework 4.8 ASP.NET MVC 5 to .NET 9 
+Migrate ContosoUniversity from .NET Framework 4.8 ASP.NET MVC 5 to .NET 10 
 ASP.NET Core MVC. Replace System.Messaging (MSMQ) with Azure Service Bus. 
 Replace the local Uploads/TeachingMaterials file system storage with 
 Azure Blob Storage. Update Entity Framework Core to the latest version.
@@ -24,7 +24,7 @@ Azure Blob Storage. Update Entity Framework Core to the latest version.
 ## Key Migration Steps (Do Not Give These to Attendees)
 
 1. **Convert project format:**
-   - Replace the legacy `.csproj` with SDK-style format targeting `net9.0`
+   - Replace the legacy `.csproj` with SDK-style format targeting `net10.0`
    - Remove `packages.config` — dependencies move to `<PackageReference>` in `.csproj`
 
 2. **Replace `System.Web` references:**
@@ -65,7 +65,7 @@ Azure Blob Storage. Update Entity Framework Core to the latest version.
 
 ## Success Criteria Notes
 
-- `dotnet build` targeting `net9.0` is binary (pass/fail)
+- `dotnet build` targeting `net10.0` is binary (pass/fail)
 - `dotnet run` starting without exceptions is the minimum functional bar
 - If attendees are running low on time, CRUD operations without Service Bus or Blob Storage integrations is acceptable — these can be stubbed
 - Showing `NotificationService.cs` using `ServiceBusClient` and the upload controller using `BlobContainerClient` are distinct verification points

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is the stretch/bonus challenge for the Java track. It covers production readiness: telemetry with Application Insights, secrets management with Key Vault, Managed Identity for passwordless auth, and a CI/CD pipeline with GitHub Actions.
+This is the core production-readiness challenge for the Java track. It covers: telemetry with Application Insights, secrets management with Key Vault, Managed Identity for passwordless auth, and a CI/CD pipeline with GitHub Actions.
 
 ## Mini-Lecture (10 min before challenge)
 

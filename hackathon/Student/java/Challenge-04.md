@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-03.md) - **[Home](../../README.md)**
+[< Previous Challenge](./Challenge-03.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-05.md)
 
-# Challenge 04 – Observe, Validate & Secure (Stretch)
+# Challenge 04 – Observe, Validate & Secure
 
 ## Introduction
 

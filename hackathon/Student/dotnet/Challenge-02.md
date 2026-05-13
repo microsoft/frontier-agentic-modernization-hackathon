@@ -12,7 +12,7 @@ The **ContosoUniversity** application is a university management system built on
 - **`packages.config` + `.csproj` format** — the legacy project format must be converted to the SDK-style `.csproj`.
 
 The target state is:
-- **.NET 9** with ASP.NET Core MVC
+- **.NET 10** with ASP.NET Core MVC
 - **Azure Service Bus** replacing MSMQ
 - **Azure Blob Storage** replacing the local file system uploads folder
 - **Azure SQL Database** (EF Core updated to latest)
@@ -23,7 +23,7 @@ The target state is:
 
 Modernize the ContosoUniversity .NET application to:
 
-- **.NET 9** ASP.NET Core MVC
+- **.NET 10** ASP.NET Core MVC
 - **Azure Service Bus** for notification messaging (replacing `System.Messaging`)
 - **Azure Blob Storage** for teaching material uploads (replacing local file system)
 - **Latest EF Core** with Azure SQL Database
@@ -48,11 +48,11 @@ Your approach should include:
 
 To complete this challenge successfully, demonstrate:
 
-- `dotnet build` succeeds with no errors targeting .NET 9
+- `dotnet build` succeeds with no errors targeting .NET 10
 - `dotnet run` starts the application without runtime errors
 - The Notifications feature uses Azure Service Bus (show the `NotificationService.cs` using `ServiceBusClient`)
 - File upload functionality references Azure Blob Storage (show the upload controller using `BlobContainerClient`)
-- `modernize assess` on the updated codebase reports no remaining critical issues for the .NET Framework 4.8 → .NET 9 migration
+- `modernize assess` on the updated codebase reports no remaining critical issues for the .NET Framework 4.8 → .NET 10 migration
 - No references to `System.Messaging`, `System.Web`, or `packages.config` remain
 
 ## Learning Resources

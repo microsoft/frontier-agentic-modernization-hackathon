@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is the stretch/bonus challenge for the .NET track. It covers production readiness: telemetry with Application Insights, secrets management with Key Vault, Managed Identity for passwordless auth, and a CI/CD pipeline with GitHub Actions.
+This is the core production-readiness challenge for the .NET track. It covers: telemetry with Application Insights, secrets management with Key Vault, Managed Identity for passwordless auth, and a CI/CD pipeline with GitHub Actions.
 
 ## Mini-Lecture (10 min before challenge)
 
@@ -48,7 +48,7 @@ No further code changes are needed — requests, dependencies, and exceptions ar
 
 Minimum workflow steps:
 1. Checkout code
-2. Set up .NET 9 (`actions/setup-dotnet`)
+2. Set up .NET 10 (`actions/setup-dotnet` with `dotnet-version: '10.0.x'`)
 3. Restore and build: `dotnet publish -c Release -o ./publish`
 4. Log in to ACR (`azure/docker-login` or `az acr login`)
 5. Build and push Docker image

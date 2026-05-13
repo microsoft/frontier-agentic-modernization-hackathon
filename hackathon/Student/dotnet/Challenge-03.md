@@ -12,7 +12,7 @@ The `hackathon/Student/Resources/dotnet/` directory contains an `infra/` directo
 
 Containerize and deploy the modernized ContosoUniversity .NET application to Azure:
 
-- Create or verify a `Dockerfile` in `../Resources/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/` that builds and runs the app on .NET 9
+- Create or verify a `Dockerfile` in `../Resources/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/` that builds and runs the app on .NET 10
 - Complete the Terraform configuration in `../Resources/dotnet/infra/` to provision:
   - Azure Container Apps environment and app
   - Azure SQL Database

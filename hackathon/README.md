@@ -9,7 +9,7 @@ In this hackathon you will use the **GitHub Copilot Modernization** tools to ass
 - **ContosoUniversity** — an ASP.NET MVC 5 application running on .NET Framework 4.8, with MSMQ messaging and local file system storage
 - **PhotoAlbum** — a Spring Boot 2.7 application running on Java 8, backed by Oracle Database with photo BLOBs
 
-By the end of the event you will have migrated both applications to modern runtimes (.NET 9 and Java 21), cloud-native Azure services, and containerized deployments on Azure Container Apps.
+By the end of the event you will have migrated both applications to modern runtimes (.NET 10 and Java 21), cloud-native Azure services, and containerized deployments on Azure Container Apps.
 
 ## Learning Objectives
 
@@ -17,7 +17,7 @@ By completing this hack you will be able to:
 
 1. Use `modernize assess` to evaluate a legacy codebase and understand its migration complexity
 2. Create AI-driven modernization plans with `modernize plan create` and execute them with `modernize plan execute`
-3. Migrate a .NET Framework 4.8 ASP.NET MVC 5 app to .NET 9 ASP.NET Core
+3. Migrate a .NET Framework 4.8 ASP.NET MVC 5 app to .NET 10 ASP.NET Core
 4. Replace MSMQ with Azure Service Bus and local file storage with Azure Blob Storage
 5. Migrate a Spring Boot 2.x / Java 8 application to Spring Boot 3.x / Java 21
 6. Replace an Oracle Database with Azure Database for PostgreSQL and Azure Blob Storage
@@ -25,18 +25,21 @@ By completing this hack you will be able to:
 
 ## Challenges
 
-- Challenge 00: **[Prerequisites — Ready, Set, GO!](Student/Challenge-00.md)**
+Each challenge has a dedicated per-track guide. Pick **`dotnet/`** or **`java/`** depending on which app you are modernizing.
+
+- Challenge 00: **Prerequisites — Ready, Set, GO!** — [.NET](Student/dotnet/Challenge-00.md) · [Java](Student/java/Challenge-00.md)
   - Prepare your workstation and verify access to all required tools and services.
-- Challenge 01: **[Assess the Legacy Applications](Student/Challenge-01.md)**
-  - Run the GitHub Copilot Modernization assessment on both apps and interpret the results.
-- Challenge 02: **[Modernize the Java Application](Student/Challenge-02.md)**
-  - Migrate PhotoAlbum from Spring Boot 2.7 / Java 8 / Oracle to Spring Boot 3.x / Java 21 / PostgreSQL + Azure Blob Storage.
-- Challenge 03: **[Modernize the .NET Application](Student/Challenge-03.md)**
-  - Migrate ContosoUniversity from .NET Framework 4.8 to .NET 9 ASP.NET Core with Azure Service Bus and Azure Blob Storage.
-- Challenge 04: **[Containerize & Deploy to Azure Container Apps](Student/Challenge-04.md)**
-  - Package both modernized apps as containers and deploy them to Azure using Terraform.
-- Challenge 05: **[Observe, Validate & Secure (Stretch)](Student/Challenge-05.md)**
+- Challenge 01: **Assess the Legacy Application** — [.NET](Student/dotnet/Challenge-01.md) · [Java](Student/java/Challenge-01.md)
+  - Run the GitHub Copilot Modernization assessment and interpret the results.
+- Challenge 02: **Modernize the Application** — [.NET](Student/dotnet/Challenge-02.md) · [Java](Student/java/Challenge-02.md)
+  - .NET: migrate ContosoUniversity from .NET Framework 4.8 to .NET 10 ASP.NET Core with Azure Service Bus and Azure Blob Storage.
+  - Java: migrate PhotoAlbum from Spring Boot 2.7 / Java 8 / Oracle to Spring Boot 3.x / Java 21 / PostgreSQL + Azure Blob Storage.
+- Challenge 03: **Containerize & Deploy to Azure Container Apps** — [.NET](Student/dotnet/Challenge-03.md) · [Java](Student/java/Challenge-03.md)
+  - Package the modernized app as a container and deploy it to Azure using Terraform.
+- Challenge 04: **Observe, Validate & Secure** — [.NET](Student/dotnet/Challenge-04.md) · [Java](Student/java/Challenge-04.md)
   - Integrate Application Insights, secure secrets with Azure Key Vault and Managed Identity.
+- Challenge 05: **Infuse AI into the Application (Stretch)** — [.NET](Student/dotnet/Challenge-05.md) · [Java](Student/java/Challenge-05.md)
+  - Add Azure OpenAI (vision, `gpt-4.1-mini`) with Managed Identity so the app generates course/photo metadata on upload.
 
 ## Prerequisites
 
@@ -103,26 +106,20 @@ modernize   # launch interactive TUI
 
 ```
 hackathon/
-├── README.md              ← This file (hack one-pager)
+├── README.md                ← This file (hack one-pager)
+├── index.html               ← Card-based navigation for the hack
 ├── Student/
-│   ├── Challenge-00.md    ← Prerequisites
-│   ├── Challenge-01.md    ← Assess
-│   ├── Challenge-02.md    ← Java modernization
-│   ├── Challenge-03.md    ← .NET modernization
-│   ├── Challenge-04.md    ← Deploy to Azure
-│   ├── Challenge-05.md    ← Stretch challenge
-│   └── Resources/         ← Helper scripts and reference files
+│   ├── dotnet/              ← Challenge-00..05 for the .NET track
+│   ├── java/                ← Challenge-00..05 for the Java track
+│   └── Resources/           ← Sample apps + helper scripts per track
 └── Coach/
-    ├── README.md          ← Coach guide and event logistics
-    ├── Challenge-00.md    ← Coach notes for Challenge 00
-    ├── Challenge-01.md    ← Coach notes for Challenge 01
-    ├── Challenge-02.md    ← Coach notes for Challenge 02
-    ├── Challenge-03.md    ← Coach notes for Challenge 03
-    ├── Challenge-04.md    ← Coach notes for Challenge 04
-    └── Challenge-05.md    ← Coach notes for Challenge 05
+    ├── README.md            ← Coach guide and event logistics
+    ├── dotnet/              ← Coach notes for the .NET track
+    ├── java/                ← Coach notes for the Java track
+    └── Resources/           ← Reference implementations the coaches run
 ```
 
-The sample applications live in the parent repository:
+The sample applications live under each track:
 
 ```
 hackathon/Student/Resources/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/   ← .NET app
