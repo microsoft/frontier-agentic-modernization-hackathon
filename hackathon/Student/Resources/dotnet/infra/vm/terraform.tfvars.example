@@ -4,7 +4,16 @@
 
 prefix               = "wth"
 location             = "swedencentral"
+dms_location         = "westeurope"         # DMS service/project region (Microsoft.DataMigration/services)
 vm_size              = "Standard_D2s_v3"
 admin_username       = "azureadmin"
 admin_password       = "CHANGEMEComplex1!"   # must be 12+ chars, upper+lower+digit+special
 resource_group_name  = "wth-contoso-vm-rg"
+
+# ── Azure SQL Server (DMS migration target) ───────────────────────────────────────
+# The DMS wizard for this flow uses SQL Authentication for the target connection.
+# sql_admin_login    = "sqladminuser"      # optional — default is already set in variables.tf
+# sql_admin_password = "SqlTarget@2024!"   # optional — default is already set in variables.tf
+
+# ── DMS source login (created on SQL Server Express for DMS connectivity) ───────
+# sql_migration_password = "DmsMigration@2024!"  # optional — default is already set in variables.tf

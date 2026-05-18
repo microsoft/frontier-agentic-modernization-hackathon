@@ -9,12 +9,19 @@ terraform {
       source  = "hashicorp/http"
       version = "~> 3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
 provider "azurerm" {
   features {}
 }
+
+# ── Detect current deploying principal ───────────────────────────────────────
+data "azurerm_client_config" "current" {}
 
 # ── Detect caller's public IP ─────────────────────────────────────────────────
 data "http" "my_ip" {
@@ -80,6 +87,30 @@ resource "azurerm_network_security_group" "nsg" {
     source_port_range          = "*"
     destination_port_range     = "80"
     source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "allow-dms-to-sql"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "1433"
+    source_address_prefix      = "10.1.2.0/24"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "allow-my-ip-sql"
+    priority                   = 130
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "1433"
+    source_address_prefix      = local.my_ip_cidr
     destination_address_prefix = "*"
   }
 }

@@ -59,7 +59,7 @@ Write-Log "Git and NuGet installed."
 
 # -- 3. Install SQL Server Express 2019 ---------------------------------------
 Write-Log "Installing SQL Server Express 2019..."
-choco install sql-server-express -y --no-progress `
+choco install sql-server-express -y --no-progress -version='2019.20190106' `
     --params="'/InstanceName:SQLEXPRESS /AddCurrentUserAsSqlAdmin'" `
     2>&1 | Tee-Object -Append -FilePath $LogFile
 
@@ -206,7 +206,7 @@ $connNode = $xml.configuration.connectionStrings.add |
 
 if ($connNode) {
     $connNode.connectionString = `
-        "Data Source=localhost\SQLEXPRESS;Initial Catalog=ContosoUniversity;Integrated Security=True;MultipleActiveResultSets=True"
+        "Data Source=tcp:localhost,1433;Initial Catalog=ContosoUniversity;Integrated Security=True;MultipleActiveResultSets=True"
     $xml.Save($webConfig)
     Write-Log "Web.config patched."
 } else {
@@ -217,6 +217,17 @@ if ($connNode) {
 $publishDir = "C:\inetpub\wwwroot\ContosoUniversity"
 Write-Log "Building and publishing to $publishDir..."
 if (-not (Test-Path $publishDir)) { New-Item -ItemType Directory -Path $publishDir | Out-Null }
+
+# Stop IIS before publishing so existing worker processes do not lock deployed DLLs.
+Write-Log "Stopping IIS before publish..."
+Import-Module WebAdministration -ErrorAction SilentlyContinue
+if (Get-Website -Name "ContosoUniversity" -ErrorAction SilentlyContinue) {
+    Stop-Website -Name "ContosoUniversity" -ErrorAction SilentlyContinue
+}
+if (Test-Path "IIS:\AppPools\ContosoUniversity") {
+    Stop-WebAppPool -Name "ContosoUniversity" -ErrorAction SilentlyContinue
+}
+Stop-Service -Name W3SVC -Force -ErrorAction SilentlyContinue
 
 # MSBuild publish uses relative paths for content files -- must run from the project directory
 Push-Location "$repoRoot\ContosoUniversity"
@@ -374,7 +385,7 @@ IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = 'IIS APPPOOL\Con
 ALTER SERVER ROLE [dbcreator] ADD MEMBER [IIS APPPOOL\ContosoUniversity];
 ALTER SERVER ROLE [sysadmin]  ADD MEMBER [IIS APPPOOL\ContosoUniversity];
 "@
-& sqlcmd -S "localhost\SQLEXPRESS" -Q $sqlGrant 2>&1 | Tee-Object -Append -FilePath $LogFile
+& sqlcmd -S "tcp:localhost,1433" -E -Q $sqlGrant 2>&1 | Tee-Object -Append -FilePath $LogFile
 Write-Log "SQL Server permissions granted."
 
 # Create Website
@@ -384,6 +395,7 @@ if (-not (Get-Website -Name "ContosoUniversity" -ErrorAction SilentlyContinue)) 
         -ApplicationPool "ContosoUniversity" `
         -Port 80 -Force
 }
+Start-Service -Name W3SVC -ErrorAction SilentlyContinue
 Start-Website -Name "ContosoUniversity" -ErrorAction SilentlyContinue
 Write-Log "IIS configured."
 
