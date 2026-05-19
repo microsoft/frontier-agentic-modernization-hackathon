@@ -1,8 +1,11 @@
 {
     "name": "PetClinic Modernization",
-    // Universal Ubuntu image ships with Java 21, Maven, Terraform, Azure CLI and Docker
-    // avoiding the Debian bookworm yarn-repo GPG key issue that breaks feature installs
-    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    // Universal Ubuntu image with Ora2Pg for Oracle→PostgreSQL migrations
+    // Ships with Java 21, Maven, Terraform, Azure CLI, Docker, and Ora2Pg
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
     // VS Code extensions pre-installed inside the container
     "customizations": {
         "vscode": {

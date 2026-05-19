@@ -141,16 +141,23 @@
         }
 
         .nav-cta {
-            font-size: .72rem;
-            letter-spacing: .1em;
-            text-transform: uppercase;
-            padding: .45rem 1.1rem;
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
             border: 1px solid var(--cyan);
             color: var(--cyan);
             border-radius: var(--radius);
             text-decoration: none;
-            font-family: 'Fira Code', monospace;
             transition: background .2s, box-shadow .2s;
+        }
+
+        .nav-cta svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
         }
 
         .nav-cta:hover {
@@ -617,18 +624,21 @@
 
         .challenge-card {
             position: relative;
-            background: var(--surface);
+            --c-color: var(--cyan);
+            background: #0c1d38;
+            border: 1px solid #173257;
             padding: 2rem;
             overflow: hidden;
             cursor: pointer;
-            transition: background .25s;
+            transition: background .25s, border-color .25s;
             text-decoration: none;
             display: flex;
             flex-direction: column;
         }
 
         .challenge-card:hover {
-            background: var(--surface-2);
+            background: #10264a;
+            border-color: #1f4c7a;
         }
 
         .challenge-card::after {
@@ -644,7 +654,7 @@
             opacity: 1;
         }
 
-        /* Color top border per challenge */
+        /* Unified top border color for all cards */
         .challenge-card::before {
             content: '';
             position: absolute;
@@ -653,38 +663,18 @@
             right: 0;
             height: 2px;
             background: var(--c-color);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform .35s ease;
-        }
-
-        .challenge-card:hover::before {
             transform: scaleX(1);
+            transform-origin: left;
         }
 
-        .challenge-card[data-phase="00"] {
-            --c-color: var(--prereq-color);
-        }
-
-        .challenge-card[data-phase="01"] {
-            --c-color: var(--assess-color);
-        }
-
-        /* Phase numbering is per-track: 02 = modernize, 03 = deploy, 04 = observe/secure, 05 = AI (stretch) */
-        .challenge-card[data-phase="02"] {
-            --c-color: var(--java-color);
-        }
-
-        .challenge-card[data-phase="03"] {
-            --c-color: var(--deploy-color);
-        }
-
-        .challenge-card[data-phase="04"] {
-            --c-color: var(--stretch-color);
-        }
-
-        .challenge-card[data-phase="05"] {
-            --c-color: var(--ai-color);
+        .challenge-card[data-phase="00"],
+        .challenge-card[data-phase="01"],
+        .challenge-card[data-phase="02"],
+        .challenge-card[data-phase="03"],
+        .challenge-card[data-phase="04"],
+        .challenge-card[data-phase="05"],
+        .challenge-card[data-phase="06"] {
+            --c-color: var(--cyan);
         }
 
         .card-bg-number {
@@ -717,13 +707,13 @@
             border: 1px solid;
             color: var(--c-color);
             border-color: var(--c-color);
-            background: transparent;
+            background: rgba(0, 217, 245, .08);
         }
 
         .card-num {
             font-family: 'Fira Code', monospace;
             font-size: .65rem;
-            color: var(--text-3);
+            color: rgba(122, 154, 184, .75);
             letter-spacing: .1em;
         }
 
@@ -739,7 +729,7 @@
         .card-desc {
             font-size: .85rem;
             line-height: 1.65;
-            color: var(--text-2);
+            color: #7ea3c9;
             font-weight: 300;
             flex: 1;
         }
@@ -750,7 +740,7 @@
             justify-content: space-between;
             margin-top: 1.5rem;
             padding-top: 1rem;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(36, 61, 92, .65);
         }
 
         .card-tags {
@@ -762,9 +752,10 @@
         .card-tag {
             font-family: 'Fira Code', monospace;
             font-size: .6rem;
-            color: var(--text-3);
+            color: #6f8fb4;
             letter-spacing: .08em;
-            background: rgba(255, 255, 255, .04);
+            background: rgba(16, 38, 74, .85);
+            border: 1px solid rgba(36, 61, 92, .45);
             padding: .2rem .55rem;
             border-radius: 3px;
         }
@@ -1458,9 +1449,16 @@
             <li><a href="#about">About</a></li>
             <li><a href="#prerequisites">Setup</a></li>
             <li><a href="#stack">Stack</a></li>
-            <li><a href="#challenges">Challenges</a></li>
+            <li><a href="#java-challenges">Java Challenge</a></li>
+            <li><a href="#dotnet-challenges">.NET Challenge</a></li>
         </ul>
-        <a class="nav-cta" href="#challenges">View Challenges →</a>
+        <a class="nav-cta" href="https://github.com/cmendible/github-copilot-modernization" target="_blank"
+            rel="noopener noreferrer" aria-label="Open GitHub repository" title="Open GitHub repository">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                    d="M12 2C6.477 2 2 6.486 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.866-.014-1.699-2.782.605-3.37-1.344-3.37-1.344-.455-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.004.07 1.532 1.033 1.532 1.033.892 1.53 2.341 1.088 2.91.832.092-.647.349-1.088.635-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.269 2.75 1.026A9.565 9.565 0 0112 6.844c.85.004 1.706.115 2.504.337 1.909-1.295 2.748-1.026 2.748-1.026.546 1.378.202 2.397.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.31.678.921.678 1.856 0 1.339-.012 2.419-.012 2.747 0 .269.18.58.688.481A10.022 10.022 0 0022 12.017C22 6.486 17.523 2 12 2z" />
+            </svg>
+        </a>
     </nav>
 
     <!-- Hero -->
@@ -1899,7 +1897,7 @@
         </div>
 
         <!-- Java Track -->
-        <div style="margin-bottom:2rem;">
+        <div id="java-challenges" style="margin-bottom:2rem;">
             <h3 class="display" style="font-size:1.1rem;letter-spacing:.12em;color:var(--cyan);margin-bottom:1.25rem;">☕
                 JAVA TRACK</h3>
             <div class="challenges-grid">
@@ -2049,11 +2047,34 @@
                     </div>
                 </a>
 
+                <!-- Java CH-06 -->
+                <a class="challenge-card half" data-phase="06" href="Student/java/Challenge-06.md">
+                    <div class="card-bg-number display">06</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Data Migration</span>
+                        <span class="card-num mono">CH — 06</span>
+                    </div>
+                    <h3 class="card-title display">Migrate the Database to PostgreSQL</h3>
+                    <p class="card-desc">
+                        Move PhotoAlbum data from Oracle to Azure Database for PostgreSQL Flexible Server
+                        using Azure Database Migration Service, then validate rows and app behavior after cutover.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">DMS</span>
+                            <span class="card-tag">PostgreSQL</span>
+                            <span class="card-tag">Offline Migration</span>
+                            <span class="card-tag">Validation</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
             </div>
         </div>
 
         <!-- .NET Track -->
-        <div>
+        <div id="dotnet-challenges">
             <h3 class="display"
                 style="font-size:1.1rem;letter-spacing:.12em;color:var(--purple);margin-bottom:1.25rem;">🔷 .NET TRACK
             </h3>
@@ -2385,6 +2406,29 @@
                     </div>
                 </a>
 
+                <!-- Coach Java CH-06 -->
+                <a class="challenge-card half" data-phase="06" href="Coach/java/Challenge-06.md">
+                    <div class="card-bg-number display">06</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Capstone · Data</span>
+                        <span class="card-num mono">COACH — 06</span>
+                    </div>
+                    <h3 class="card-title display">Migrate the Database — Coach Notes</h3>
+                    <p class="card-desc">
+                        Mini-lecture on Oracle→PostgreSQL differences, Ora2Pg workflow with troubleshooting table,
+                        common pitfalls, and step-by-step reference implementation with <code class="mono"
+                            style="font-size:.85em">ora2pg.conf</code> template.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">Ora2Pg</span>
+                            <span class="card-tag">offline migration</span>
+                            <span class="card-tag">pitfalls</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
             </div>
         </div>
 
@@ -2568,6 +2612,7 @@
             <li><a href="Student/java/Challenge-03.md">Java CH-03</a></li>
             <li><a href="Student/java/Challenge-04.md">Java CH-04</a></li>
             <li><a href="Student/java/Challenge-05.md">Java CH-05</a></li>
+            <li><a href="Student/java/Challenge-06.md">Java CH-06</a></li>
             <li><a href="Student/dotnet/Challenge-00.md">.NET CH-00</a></li>
             <li><a href="Student/dotnet/Challenge-01.md">.NET CH-01</a></li>
             <li><a href="Student/dotnet/Challenge-02.md">.NET CH-02</a></li>
@@ -2721,11 +2766,15 @@
             { label: 'NET-04', file: 'Student/dotnet/Challenge-04.md', title: '.NET – Observe & Secure' },
             { label: 'NET-05', file: 'Student/dotnet/Challenge-05.md', title: '.NET – AI Assist' },
             { label: 'NET-06', file: 'Student/dotnet/Challenge-06.md', title: '.NET – Migrate Data' },
+            { label: 'JAVA-05', file: 'Student/java/Challenge-05.md', title: 'Java – AI Assist' },
+            { label: 'JAVA-06', file: 'Student/java/Challenge-06.md', title: 'Java – Migrate Data' },
             { label: 'COACH-JAVA-00', file: 'Coach/java/Challenge-00.md', title: 'Coach · Java – Prerequisites' },
             { label: 'COACH-JAVA-01', file: 'Coach/java/Challenge-01.md', title: 'Coach · Java – Assess' },
             { label: 'COACH-JAVA-02', file: 'Coach/java/Challenge-02.md', title: 'Coach · Java – Modernize' },
             { label: 'COACH-JAVA-03', file: 'Coach/java/Challenge-03.md', title: 'Coach · Java – Deploy' },
             { label: 'COACH-JAVA-04', file: 'Coach/java/Challenge-04.md', title: 'Coach · Java – Observe & Secure' },
+            { label: 'COACH-JAVA-05', file: 'Coach/java/Challenge-05.md', title: 'Coach · Java – AI Assist' },
+            { label: 'COACH-JAVA-06', file: 'Coach/java/Challenge-06.md', title: 'Coach · Java – Migrate Data' },
             { label: 'COACH-NET-00', file: 'Coach/dotnet/Challenge-00.md', title: 'Coach · .NET – Prerequisites' },
             { label: 'COACH-NET-01', file: 'Coach/dotnet/Challenge-01.md', title: 'Coach · .NET – Assess' },
             { label: 'COACH-NET-02', file: 'Coach/dotnet/Challenge-02.md', title: 'Coach · .NET – Modernize' },

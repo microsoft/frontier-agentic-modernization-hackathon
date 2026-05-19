@@ -53,6 +53,12 @@ usermod -aG docker azureuser || true
 
 echo "--- Docker $(docker --version) installed."
 
+# ── 2.5 Install Ora2Pg and PostgreSQL client for offline Oracle→PostgreSQL migration ─
+echo "--- Installing Ora2Pg, PostgreSQL client, and dependencies..."
+apt-get install -y perl cpanminus postgresql-client
+sudo cpanm DBD::Oracle Ora2Pg 2>/dev/null || echo "Warning: Ora2Pg install via cpan may require Oracle client libs. Manual install documented in Challenge 06."
+echo "--- Ora2Pg $(ora2pg --version 2>/dev/null || echo 'installed (version check may require Oracle libs)') and psql $(psql --version) available."
+
 # ── 3. Clone the PhotoAlbum-Java repository ───────────────────────────────────
 REPO_URL="https://github.com/Azure-Samples/PhotoAlbum-Java.git"
 APP_DIR="/opt/photoalbum"

@@ -57,11 +57,11 @@ resource "azurerm_virtual_network_peering" "dms_to_source" {
 
 # ── Target: Azure SQL Server ──────────────────────────────────────────────────
 resource "azurerm_mssql_server" "target" {
-  name                = "${var.prefix}-sql-${random_string.suffix.result}"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  version             = "12.0"
-  minimum_tls_version = "1.2"
+  name                         = "${var.prefix}-sql-${random_string.suffix.result}"
+  resource_group_name          = azurerm_resource_group.rg.name
+  location                     = azurerm_resource_group.rg.location
+  version                      = "12.0"
+  minimum_tls_version          = "1.2"
   administrator_login          = var.sql_admin_login
   administrator_login_password = var.sql_admin_password
 

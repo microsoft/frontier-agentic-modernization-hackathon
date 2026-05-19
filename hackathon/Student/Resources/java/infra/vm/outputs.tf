@@ -17,3 +17,15 @@ output "setup_status" {
   description = "cloud-init runs setup.sh at first boot. Allow 5–10 minutes for Docker, the app build, and Oracle initialisation."
   value       = "Visit http://${azurerm_public_ip.pip.ip_address}:8080 after ~10 minutes. SSH in and run 'sudo docker compose -f /opt/photoalbum/docker-compose.yml ps' to check container status."
 }
+
+# ── Ora2Pg migration target outputs ───────────────────────────────────────────
+output "target_postgresql_fqdn" {
+  description = "Fully-qualified domain name of the target Azure Database for PostgreSQL Flexible Server."
+  value       = azurerm_postgresql_flexible_server.target.fqdn
+}
+
+output "target_postgresql_database" {
+  description = "Name of the target PostgreSQL database."
+  value       = azurerm_postgresql_flexible_server_database.photoalbum.name
+}
+
