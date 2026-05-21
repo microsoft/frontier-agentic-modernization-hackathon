@@ -11,7 +11,7 @@ This hack is designed for squads of 3–5 people. It covers two parallel moderni
 | Java | PhotoAlbum | Spring Boot 2.7 / Java 8 / Oracle DB | Spring Boot 3.x / Java 21 / PostgreSQL + Azure Blob |
 | .NET | ContosoUniversity | .NET Framework 4.8 / ASP.NET MVC 5 / MSMQ | .NET 10 / ASP.NET Core / Azure Service Bus + Blob |
 
-Challenges 02 and 03 are designed to be parallelized within a squad — some members take Java, others take .NET. Both tracks converge in Challenge 04 (deployment).
+Challenges 02 and 03 are designed to be parallelized within a squad — some members take Java, others take .NET. Both tracks converge in Challenge 03 (deployment).
 
 ## Event Logistics
 
@@ -28,9 +28,10 @@ Challenges 02 and 03 are designed to be parallelized within a squad — some mem
 | 13:00 – 14:00 | Lunch break |
 | 14:00 – 15:30 | Continue Challenge 02 |
 | 15:30 – 16:30 | Challenge 03 — Deploy to Azure |
-| 16:30 – 17:15 | Challenge 04 — Observe, Validate & Secure (core) |
-| 17:15 – 17:30 | Challenge 05 (stretch, optional) — Infuse AI |
-| 17:30 – 18:00 | Wrap-up, retrospective, demo |
+| 16:30 – 17:15 | Challenge 04 — Migrate the Database to Azure (core) |
+| 17:15 – 17:45 | Challenge 05 — Observe & Secure (core) |
+| 17:45 – 18:00 | Challenge 06 (stretch, optional) — Infuse AI |
+| 18:00 – 18:30 | Wrap-up, retrospective, demo |
 
 ### Squad Size
 
@@ -64,13 +65,15 @@ Coach notes live in per-track subfolders. Pick the track you are coaching:
 - [Challenge 01 – Assess](./dotnet/Challenge-01.md)
 - [Challenge 02 – .NET Modernization](./dotnet/Challenge-02.md)
 - [Challenge 03 – Deploy to Azure](./dotnet/Challenge-03.md)
-- [Challenge 04 – Observe, Validate & Secure](./dotnet/Challenge-04.md)
-- [Challenge 05 – Infuse AI (stretch)](./dotnet/Challenge-05.md)
+- [Challenge 04 – Migrate the Database to Azure](./dotnet/Challenge-04.md)
+- [Challenge 05 – Observe & Secure](./dotnet/Challenge-05.md)
+- [Challenge 06 – Infuse AI (stretch)](./dotnet/Challenge-06.md)
 
 **Java track**
 - [Challenge 00 – Prerequisites](./java/Challenge-00.md)
 - [Challenge 01 – Assess](./java/Challenge-01.md)
 - [Challenge 02 – Java Modernization](./java/Challenge-02.md)
 - [Challenge 03 – Deploy to Azure](./java/Challenge-03.md)
-- [Challenge 04 – Observe, Validate & Secure](./java/Challenge-04.md)
-- [Challenge 05 – Infuse AI (stretch)](./java/Challenge-05.md)
+- [Challenge 04 – Migrate the Database to Azure](./java/Challenge-04.md)
+- [Challenge 05 – Observe & Secure](./java/Challenge-05.md)
+- [Challenge 06 – Infuse AI (stretch)](./java/Challenge-06.md)

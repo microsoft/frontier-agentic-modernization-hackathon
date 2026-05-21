@@ -1,189 +1,69 @@
-# Coach Guide – Challenge 05: Infuse AI into PhotoAlbum (Java Track) — Stretch
+# Coach Guide – Challenge 05: Observe & Secure (Java Track)
 
 ## Purpose
 
-This is the **stretch AI-infusion challenge** for the Java track (optional, attempt only if the squad finishes Challenge 04 with time to spare). The squad extends the modernized PhotoAlbum so every photo upload triggers a vision call to Azure OpenAI and is auto-tagged. End-to-end: Terraform (Azure OpenAI account + model deployment + RBAC), Java service code (`azure-ai-openai`, `DefaultAzureCredentialBuilder`, structured JSON), Thymeleaf template updates, and verification in Azure.
-
-A working reference implementation lives under `Coach/Resources/java/PhotoAlbum-Java/` and `Coach/Resources/java/infra/aca/`. Use it to diff against student work, not as a hand-out.
+This is the core production-readiness challenge for the Java track. It covers: telemetry with Application Insights, secrets management with Key Vault, Managed Identity for passwordless auth, and a CI/CD pipeline with GitHub Actions.
 
 ## Mini-Lecture (10 min before challenge)
 
 Cover:
+- Why connection strings in environment variables are not enough for production security
+- The Managed Identity model: identity attached to the Container App, Key Vault RBAC grants read access
+- The Application Insights Java agent: zero-code instrumentation via a JAR injected at startup
+- The difference between `az webapp` and `az containerapp` in GitHub Actions deployment patterns
 
-- **Why Managed Identity beats API keys** for Azure OpenAI: no secrets, role-based revocation, audit trail. Tie it back to Challenge-04's Key Vault + MI work.
-- **Vision chat completions structure**: a single user message whose content is a `List<ChatMessageContentItem>` with a `ChatMessageTextContentItem` (instructions) and a `ChatMessageImageContentItem` whose `imageUrl` is a base64 `data:` URI.
-- **Structured outputs** via `ChatCompletionsJsonResponseFormat`. Stress that the system prompt must contain the literal word "JSON" or the service refuses.
-- **Graceful degradation**: the AI call is non-critical. `Optional.empty()` on failure; `try/catch` around the call; `WARN` log; the upload completes.
-- **Cost & model choice**: `gpt-4.1-mini` is vision-capable, fast, cheap. Available in Sweden Central and East US 2 — match Challenge-03's region.
+## Application Insights – Java
 
-## Pinned SDK & model versions
+The Java in-process agent approach (no SDK code changes required):
 
-| Component | Pinned version |
-|---|---|
-| `com.azure:azure-ai-openai` | `1.0.0-beta.16` (or latest beta) |
-| `com.azure:azure-identity` | managed by `spring-cloud-azure-dependencies` 5.18.0 BOM |
-| Azure OpenAI model | `gpt-4.1-mini` |
-| AzureRM Terraform provider | `~> 3.0` (already in use) |
-
-## Reference Terraform additions
-
-In [`Coach/Resources/java/infra/aca/main.tf`](../Resources/java/infra/aca/main.tf):
-
-```hcl
-resource "azurerm_cognitive_account" "openai" {
-  name                  = "${var.prefix}-aoai-${local.suffix}"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  kind                  = "OpenAI"
-  sku_name              = "S0"
-  custom_subdomain_name = "${var.prefix}-aoai-${local.suffix}"
-
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-resource "azurerm_cognitive_deployment" "gpt41_mini" {
-  name                 = "gpt-4.1-mini"
-  cognitive_account_id = azurerm_cognitive_account.openai.id
-
-  model {
-    format  = "OpenAI"
-    name    = "gpt-4.1-mini"
-    version = "2025-04-14"
-  }
-
-  sku {
-    name     = "GlobalStandard"
-    capacity = 50
-  }
-}
-
-resource "azurerm_role_assignment" "aoai_user" {
-  scope                = azurerm_cognitive_account.openai.id
-  role_definition_name = "Cognitive Services OpenAI User"
-  principal_id         = azurerm_container_app.photoalbum.identity[0].principal_id
-}
+1. Download the agent JAR and include it in the Docker image:
+```dockerfile
+ADD https://github.com/microsoft/ApplicationInsights-Java/releases/download/3.x.x/applicationinsights-agent-3.x.x.jar /app/applicationinsights-agent.jar
+ENV JAVA_TOOL_OPTIONS="-javaagent:/app/applicationinsights-agent.jar"
 ```
 
-Add to the `template { container { ... } }` block of `azurerm_container_app.photoalbum`:
-
-```hcl
-env {
-  name  = "AZURE_OPENAI_ENDPOINT"
-  value = azurerm_cognitive_account.openai.endpoint
-}
-
-env {
-  name  = "AZURE_OPENAI_DEPLOYMENT"
-  value = azurerm_cognitive_deployment.gpt41_mini.name
-}
+2. Set the connection string via environment variable in the Container App:
+```
+APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...;IngestionEndpoint=...
 ```
 
-## Reference Java snippets
+3. No changes to `pom.xml` or Java source code are required.
 
-`src/main/java/com/photoalbum/dto/PhotoAiSuggestion.java`:
+## Key Vault + Managed Identity – Java
 
-```java
-public record PhotoAiSuggestion(String caption, String altText, java.util.List<String> tags) {}
-```
+1. Provision Key Vault and store secrets (PostgreSQL connection string, Storage account key, etc.)
+2. Assign the Container App's system-assigned identity the **Key Vault Secrets User** role
+3. In `application.properties`, reference secrets via the Azure Spring integration:
+   ```properties
+   spring.cloud.azure.keyvault.secret.endpoint=https://<vault>.vault.azure.net/
+   ```
+   Or inject via environment variables using the Azure Key Vault references feature in Container Apps.
 
-`src/main/java/com/photoalbum/service/PhotoAiService.java`:
+## GitHub Actions CI/CD – Java
 
-```java
-public interface PhotoAiService {
-    java.util.Optional<PhotoAiSuggestion> analyze(byte[] imageBytes, String mimeType);
-}
-```
+Minimum workflow steps:
+1. Checkout code
+2. Set up Java 21 (`actions/setup-java`)
+3. Build with `mvn clean package -DskipTests`
+4. Log in to ACR (`azure/docker-login` or `az acr login`)
+5. Build and push Docker image
+6. Update Container App with `az containerapp update --image`
 
-`PhotoAiServiceImpl` essentials:
-
-```java
-OpenAIClient client = new OpenAIClientBuilder()
-    .endpoint(endpoint)
-    .credential(new DefaultAzureCredentialBuilder().build())
-    .buildClient();
-
-String dataUri = "data:" + mimeType + ";base64,"
-    + java.util.Base64.getEncoder().encodeToString(imageBytes);
-
-var messages = java.util.List.of(
-    new ChatRequestSystemMessage(
-        "You assist a photo gallery. Inspect the image and return ONLY a JSON object " +
-        "with this exact shape: " +
-        "{ \"caption\": string, \"altText\": string, \"tags\": string[] }. " +
-        "Caption < 120 chars. altText is an accessibility description. " +
-        "Provide 5 to 10 tags (single lowercase words)."),
-    new ChatRequestUserMessage(java.util.List.of(
-        new ChatMessageTextContentItem("Describe this photo."),
-        new ChatMessageImageContentItem(new ChatMessageImageUrl(dataUri))))
-);
-
-var options = new ChatCompletionsOptions(messages)
-    .setResponseFormat(new ChatCompletionsJsonResponseFormat())
-    .setTemperature(0.2)
-    .setMaxTokens(500);
-
-ChatCompletions resp = client.getChatCompletions(deployment, options);
-String json = resp.getChoices().get(0).getMessage().getContent();
-PhotoAiSuggestion s = new ObjectMapper().readValue(json, PhotoAiSuggestion.class);
-return Optional.of(s);
-```
-
-Integration in `PhotoServiceImpl.uploadPhoto` (after dimensions extraction, before `photoRepository.save`):
-
-```java
-try {
-    photoAiService.analyze(photoData, file.getContentType()).ifPresent(s -> {
-        photo.setCaption(s.caption());
-        photo.setAltText(s.altText());
-        photo.setTags(s.tags() == null ? null : String.join(",", s.tags()));
-    });
-} catch (Exception e) {
-    logger.warn("AI analysis failed for {} — saving without AI metadata", file.getOriginalFilename(), e);
-}
-```
-
-`application.properties`:
-
-```properties
-azure.openai.endpoint=${AZURE_OPENAI_ENDPOINT:}
-azure.openai.deployment=${AZURE_OPENAI_DEPLOYMENT:gpt-4.1-mini}
-```
+Trigger: `push` to `main`
 
 ## Common Pitfalls
 
 | Issue | Hint to give |
 |---|---|
-| `401 Unauthorized` from Azure OpenAI right after `terraform apply` | RBAC propagation takes 1–2 minutes. Retry instead of debugging. |
-| `403 Forbidden` even after waiting | Role was assigned to the wrong principal. Confirm `principal_id = azurerm_container_app.photoalbum.identity[0].principal_id`. |
-| Jackson throws `JsonParseException` because the response has prose around the JSON | The student forgot `setResponseFormat(new ChatCompletionsJsonResponseFormat())`. Also: the system prompt must mention "JSON". |
-| `BadRequest: 'messages[1].content' value is invalid` | The `ChatRequestUserMessage` constructor for multi-part content expects `List<ChatMessageContentItem>`, not a `String`. Different constructor. |
-| `DefaultAzureCredential` works locally but fails in the Container App | `identity { type = "SystemAssigned" }` missing on the Container App, or the new revision was never deployed after Terraform changes. |
-| `gpt-4.1-mini` quota is 0 in this region | Switch region in `variables.tf` (Sweden Central / East US 2) or request quota in the portal. Coach has a fallback subscription. |
-| Hibernate doesn't add the new columns | Confirm `spring.jpa.hibernate.ddl-auto=update` (or `create`) in `application.properties` and the app was restarted. |
-| Thymeleaf error `EL1008E` on `${photo.tags}` | The getter must be `getTags()` and the field must be a real JPA column — not `@Transient`. |
-| Upload latency jumps from 200 ms to 8 s | This is expected — the AI call is synchronous. Discuss async/background queue as a future improvement, not a fix for the hack. |
-| `MalformedJsonException` reading `caption` field | Model occasionally returns `null` for fields. Make sure the DTO uses object (`String`) types, not primitives, and that `setCaption(null)` is acceptable. |
+| App Insights agent JAR not downloaded in Docker build (no internet) | Pre-download the JAR and `COPY` it instead of using `ADD` with a URL |
+| Managed Identity not assigned after `terraform apply` | Requires `identity { type = "SystemAssigned" }` in the Container App Terraform resource |
+| Key Vault soft delete prevents `terraform destroy` + reapply | Set `soft_delete_retention_days = 7` and use `purge_protection_enabled = false` for dev environments |
+| GitHub Actions secret `AZURE_CREDENTIALS` format | Must be the full JSON object from `az ad sp create-for-rbac --sdk-auth` |
+| `JAVA_TOOL_OPTIONS` not propagating into the JVM | Ensure the env var is set in the Container App environment, not only in Dockerfile |
 
 ## Success Criteria Notes
 
-Award full credit when all five conditions hold:
-
-1. Azure OpenAI account + `gpt-4.1-mini` deployment exist via Terraform (not the portal).
-2. The Container App has only `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — **no key**.
-3. `az role assignment list --assignee <container-app-identity-principalId>` shows `Cognitive Services OpenAI User` on the OpenAI scope.
-4. New uploads have non-null `caption`, `alt_text`, and ≥3 `tags` in the `photos` table.
-5. Removing the role assignment still allows uploads to succeed (only AI fields are null) — verifies the `try/catch` is in place.
-
-Partial credit is fine for time-boxed squads — the priority is **Managed Identity + a working vision call + graceful degradation**. The reanalyze endpoint and tag badges in the UI are polish.
-
-## Time budget
-
-60–90 minutes:
-
-- 15 min: Terraform additions + `terraform apply`.
-- 25 min: `azure-ai-openai` integration (DTO + service + integration in `PhotoServiceImpl`).
-- 15 min: entity + repository (`ddl-auto=update` does the schema work).
-- 20 min: Thymeleaf template updates.
-- 15 min: build new image, push to ACR, deploy new revision, verify end-to-end.
+- At least one request should appear in Application Insights Live Metrics after the app is accessed
+- A Key Vault secret (not a plain env var) must be the source of at least one credential
+- The GitHub Actions workflow must complete successfully and deploy a new image revision
+- All three criteria above must be met for full credit; partial credit is acceptable given the time constraint

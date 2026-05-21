@@ -1,69 +1,193 @@
-# Coach Guide – Challenge 04: Observe, Validate & Secure (Java Track)
+# Coach Guide – Challenge 04: Migrate the Database to Azure (Java Track)
 
 ## Purpose
 
-This is the core production-readiness challenge for the Java track. It covers: telemetry with Application Insights, secrets management with Key Vault, Managed Identity for passwordless auth, and a CI/CD pipeline with GitHub Actions.
+This challenge takes the squad through a production-grade data migration from the Oracle XE database (running as a Docker container in the legacy stack) to the Azure Database for PostgreSQL Flexible Server provisioned in Challenge 03.
+
+Use this guidance with two valid migration paths:
+- Primary path: Ora2Pg export + psql import.
+- Alternative path: VS Code PostgreSQL extension (`ms-ossdata.vscode-pgsql`) with Schema and Application Conversion (Preview).
+
+In environments where Preview capabilities are enabled, the same extension can also drive AI-assisted **Schema Conversion** and **Application Conversion** for Oracle-to-PostgreSQL modernization.
+
+This is a critical cutover step: application state moves to managed PostgreSQL so the Oracle container can be decommissioned before post-cutover hardening.
+
+A working reference for the Azure infrastructure already lives in `Coach/Resources/java/infra/aca/`. The `azurerm_postgresql_flexible_server` resource provisioned there is the migration target.
+
+---
 
 ## Mini-Lecture (10 min before challenge)
 
 Cover:
-- Why connection strings in environment variables are not enough for production security
-- The Managed Identity model: identity attached to the Container App, Key Vault RBAC grants read access
-- The Application Insights Java agent: zero-code instrumentation via a JAR injected at startup
-- The difference between `az webapp` and `az containerapp` in GitHub Actions deployment patterns
 
-## Application Insights – Java
+- Why data migration is separate from code modernization. Challenges 02–05 moved runtime and architecture; this challenge moves state.
+- Oracle to PostgreSQL differences relevant to this scenario:
+  - Sequences and identity semantics
+  - Data type mapping (`VARCHAR2`, `NUMBER`, `BLOB`, `CLOB`, `DATE/TIMESTAMP`)
+  - Identifier case and quoting behavior
+- Ora2Pg primary path characteristics:
+  - Offline, deterministic approach that is easy to run in a workshop setting
+  - Generates an auditable SQL artifact (`photoalbum.sql`)
+- Preview conversion characteristics (alternative path, if enabled):
+  - AI-assisted schema conversion of tables, views, procedures, functions, and triggers
+  - Scratch-database validation of converted objects before deployment
+  - Automatic application-code conversion with migration report and side-by-side diffs
+  - Review Tasks for unsupported Oracle-specific constructs, which can be resolved with Copilot assistance
+- Hibernate protection rule:
+  - `spring.jpa.hibernate.ddl-auto=create` will destroy migrated data
+  - Must be set to `validate` (or `none`) before app startup against the migrated target
 
-The Java in-process agent approach (no SDK code changes required):
+---
 
-1. Download the agent JAR and include it in the Docker image:
-```dockerfile
-ADD https://github.com/microsoft/ApplicationInsights-Java/releases/download/3.x.x/applicationinsights-agent-3.x.x.jar /app/applicationinsights-agent.jar
-ENV JAVA_TOOL_OPTIONS="-javaagent:/app/applicationinsights-agent.jar"
+## Pre-requisites
+
+| Tool | Install / Notes |
+|---|---|
+| Oracle XE container running | `docker compose up -d` in `Resources/java/PhotoAlbum-Java/` |
+| Ora2Pg | `brew install ora2pg` (macOS) or `sudo apt-get install -y perl cpanminus && sudo cpanm DBD::Oracle Ora2Pg` (Linux) |
+| psql CLI | `sudo apt-get install postgresql-client` or [Windows installer](https://www.postgresql.org/download/windows/) |
+| Optional tooling path | VS Code PostgreSQL extension: [`ms-ossdata.vscode-pgsql`](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql) |
+| Azure CLI | already installed from Challenge 00 |
+| Seeded source data | Run legacy app once and upload at least 2–3 photos |
+
+The squad must have completed Challenge 03 (`terraform apply` succeeded) so the PostgreSQL server and `photoalbum` database exist.
+
+---
+
+## Expected Findings / Key Steps
+
+### 1 — Start Oracle and seed source data
+
+```bash
+cd Resources/java/PhotoAlbum-Java
+docker compose up -d
+./mvnw spring-boot:run
 ```
 
-2. Set the connection string via environment variable in the Container App:
+Have students upload at least 2–3 photos (`http://localhost:8080`). Stop the app, then validate source row count in Oracle.
+
+Expected: `photos` has at least 2 rows.
+
+### 2 — Primary path: Ora2Pg export + psql import
+
+1. Copy and adjust the template in `Coach/Resources/java/ora2pg.conf`.
+2. Export SQL:
+
+```bash
+ora2pg -c ora2pg.conf -o ./photoalbum.sql
 ```
-APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...;IngestionEndpoint=...
+
+3. Import into Azure PostgreSQL:
+
+```bash
+cd Resources/java/infra/aca/
+terraform output db_fqdn
+terraform output db_admin_username
+
+export PGPASSWORD="<admin-password>"
+psql -h <db-fqdn> -U <admin-user> -d photoalbum < photoalbum.sql
 ```
 
-3. No changes to `pom.xml` or Java source code are required.
+Expected: import completes without fatal errors.
 
-## Key Vault + Managed Identity – Java
+Coach prompts:
+- Confirm generated SQL exists and is non-empty.
+- Confirm import log has no terminal error.
 
-1. Provision Key Vault and store secrets (PostgreSQL connection string, Storage account key, etc.)
-2. Assign the Container App's system-assigned identity the **Key Vault Secrets User** role
-3. In `application.properties`, reference secrets via the Azure Spring integration:
-   ```properties
-   spring.cloud.azure.keyvault.secret.endpoint=https://<vault>.vault.azure.net/
-   ```
-   Or inject via environment variables using the Azure Key Vault references feature in Container Apps.
+### 3 — Alternative path: VS Code extension Preview migration
 
-## GitHub Actions CI/CD – Java
+1. Install extension: [`ms-ossdata.vscode-pgsql`](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql).
+2. Start **Schema Conversion** from Oracle to Azure Database for PostgreSQL.
+3. Review converted objects and resolve any **Review Tasks**.
+4. Validate converted schema in the scratch environment.
+5. Run **Application Conversion** (recommended after schema conversion).
+6. Review generated migration report and diffs; apply approved changes.
 
-Minimum workflow steps:
-1. Checkout code
-2. Set up Java 21 (`actions/setup-java`)
-3. Build with `mvn clean package -DskipTests`
-4. Log in to ACR (`azure/docker-login` or `az acr login`)
-5. Build and push Docker image
-6. Update Container App with `az containerapp update --image`
+Coach prompts:
+- Keep this path optional and do not block progress if Preview features are unavailable.
+- Keep row-count and binary-data validation mandatory after deployment.
 
-Trigger: `push` to `main`
+### 4 — Prevent Hibernate from wiping migrated data
+
+Before app startup against PostgreSQL, set:
+
+```properties
+spring.jpa.hibernate.ddl-auto=validate
+```
+
+Or override with env var in runtime:
+
+```bash
+SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+```
+
+### 5 — Validate migrated data
+
+Run in PostgreSQL:
+
+```sql
+SELECT COUNT(*) FROM photos;
+
+SELECT id, original_file_name, mime_type, file_size, uploaded_at
+FROM photos
+ORDER BY uploaded_at DESC
+LIMIT 5;
+
+SELECT COUNT(*) AS rows_with_photo_data
+FROM photos
+WHERE photo_data IS NOT NULL;
+```
+
+Expected: row counts match Oracle source and sample rows look correct.
+
+### 6 — Verify app behavior against migrated target
+
+Set PostgreSQL env vars, run app, and confirm the gallery shows migrated photos without re-uploading.
+
+### 7 — Decommission Oracle container
+
+```bash
+docker compose down -v
+```
+
+Use this only after validation is complete.
+
+---
 
 ## Common Pitfalls
 
-| Issue | Hint to give |
+| Symptom | Root Cause | Coaching Hint |
+|---|---|---|
+| Ora2Pg cannot connect | Oracle not ready or bad DSN | Check container status and `ORACLE_DSN`; retry after Oracle warm-up |
+| Ora2Pg module errors | Missing Perl dependencies | Install `DBD::Oracle` and re-run export |
+| `psql` auth or SSL errors | Wrong credentials / SSL mode mismatch | Re-check secrets and test with explicit SSL mode flags |
+| Preview conversion controls not visible | Feature not enabled in current environment/tenant | Switch to fallback Ora2Pg path without blocking challenge progress |
+| Preview conversion tasks remain unresolved | Oracle-specific constructs need manual intervention | Use Review Tasks + Copilot-guided fixes before final sign-off |
+| App starts with empty/changed data | `ddl-auto=create` reset schema | Enforce `ddl-auto=validate` before app startup |
+
+---
+
+## Success Criteria
+
+| Criterion | Notes |
 |---|---|
-| App Insights agent JAR not downloaded in Docker build (no internet) | Pre-download the JAR and `COPY` it instead of using `ADD` with a URL |
-| Managed Identity not assigned after `terraform apply` | Requires `identity { type = "SystemAssigned" }` in the Container App Terraform resource |
-| Key Vault soft delete prevents `terraform destroy` + reapply | Set `soft_delete_retention_days = 7` and use `purge_protection_enabled = false` for dev environments |
-| GitHub Actions secret `AZURE_CREDENTIALS` format | Must be the full JSON object from `az ad sp create-for-rbac --sdk-auth` |
-| `JAVA_TOOL_OPTIONS` not propagating into the JVM | Ensure the env var is set in the Container App environment, not only in Dockerfile |
+| Migration completes via one valid workflow | Primary: Ora2Pg + `psql`; alternative: extension Preview conversion workflow |
+| Row count parity on `photos` | `COUNT(*)` matches source Oracle count |
+| Binary data preserved | `photo_data` check returns non-zero rows when source had images |
+| Application displays migrated photos | Run against PostgreSQL and verify gallery |
+| `ddl-auto` protection applied | `validate` (or `none`) is set, not `create` |
+| Oracle container decommissioned | Done only after successful validation |
+| If Preview conversion is used, migration report reviewed | All Review Tasks are resolved or explicitly documented |
 
-## Success Criteria Notes
+---
 
-- At least one request should appear in Application Insights Live Metrics after the app is accessed
-- A Key Vault secret (not a plain env var) must be the source of at least one credential
-- The GitHub Actions workflow must complete successfully and deploy a new image revision
-- All three criteria above must be met for full credit; partial credit is acceptable given the time constraint
+## Learning Resources
+
+- [Ora2Pg Documentation](https://github.com/darold/ora2pg)
+- [Ora2Pg Configuration Reference](https://ora2pg.darold.net/configuration.html)
+- [VS Code PostgreSQL extension (`ms-ossdata.vscode-pgsql`)](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql)
+- [Oracle to Azure Database for PostgreSQL Schema and Application Conversion (Preview)](https://learn.microsoft.com/azure/postgresql/migrate/oracle/schema-application-conversion)
+- [Oracle to PostgreSQL migration guidance](https://learn.microsoft.com/azure/postgresql/migrate/how-to-migrate-from-oracle)
+- [Azure Database for PostgreSQL Flexible Server overview](https://learn.microsoft.com/azure/postgresql/flexible-server/overview)
+- [psql reference](https://www.postgresql.org/docs/current/app-psql.html)
+- [Hibernate hbm2ddl (`ddl-auto`) reference](https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)

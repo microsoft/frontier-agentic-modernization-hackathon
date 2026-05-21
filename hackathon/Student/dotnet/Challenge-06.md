@@ -1,67 +1,70 @@
 [< Previous Challenge](./Challenge-05.md) - **[Home](../../README.md)**
 
-# Challenge 06 – Migrate the ContosoUniversity Database to Azure SQL
+# Challenge 06 – Infuse AI into ContosoUniversity (Stretch)
 
 ## Introduction
 
-The modernized ContosoUniversity runs on .NET 10 in Azure Container Apps with Azure SQL Database, Service Bus, and Blob Storage. However, the **production data** from the legacy application still lives in the on-premises SQL Express / LocalDB instance. Before decommissioning the legacy system, that data must be **migrated to the Azure SQL Database** with full fidelity and validation.
+The modernized ContosoUniversity now runs on .NET 10 with Azure SQL, Service Bus, and Blob Storage. In this challenge you will **infuse Azure OpenAI** into the application so the admin gets meaningful help when authoring courses.
 
-In this challenge you will use **Azure Database Migration Service (DMS)** — operated directly from the **Azure Portal** — to assess compatibility, migrate the schema and data, validate the results, and confirm the application reads its production data from Azure.
+When an admin uploads a *teaching-material image* on the Course Create/Edit pages, the application will call **Azure OpenAI (gpt-4.1-mini, vision)** and receive structured suggestions:
+
+- A short **course description** based on the image.
+- A list of **learning objectives**.
+- An accessible **`alt` text** that will be rendered on the Course Details page.
+
+Authentication to Azure OpenAI uses **Managed Identity** — no API keys anywhere in code, config, or environment variables.
 
 ## Description
 
-Perform a complete offline database migration from the legacy ContosoUniversity LocalDB instance to the Azure SQL Database provisioned in Challenge 03.
+Extend the ContosoUniversity .NET application end-to-end with an AI-assisted course content workflow.
 
-**Assessment**
+**Infrastructure (Terraform under `Resources/dotnet/infra/aca/`)**
 
-- In the **Azure Portal**, create an **Azure Database Migration Service** instance in the same resource group as the Challenge 03 infrastructure.
-- Create a new migration project targeting **SQL Server → Azure SQL Database** and connect to the source database (`(localdb)\MSSQLLocalDB`, database `ContosoUniversityNoAuthEFCore`).
-- Run the built-in assessment to surface any compatibility issues between the SQL Express source and Azure SQL Database target.
-- Review the report and confirm there are no blocking issues before proceeding.
+- Add an `azurerm_cognitive_account` resource of kind `OpenAI`.
+- Add an `azurerm_cognitive_deployment` for the **`gpt-4.1-mini`** model (vision-capable).
+- Grant the Container App's **system-assigned managed identity** the `Cognitive Services OpenAI User` role on the OpenAI account.
+- Expose two new Container App env vars to the application:
+  - `AzureOpenAI__Endpoint` → the OpenAI account endpoint.
+  - `AzureOpenAI__Deployment` → the `gpt-4.1-mini` deployment name.
 
-**Migration**
+**Application code (under `Resources/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/`)**
 
-- Using the DMS migration wizard in the Azure Portal, configure an **offline migration** from LocalDB to the Azure SQL Database created by your Terraform infrastructure.
-- Provision a new **Azure Database Migration Service** instance (Free tier) in the same resource group.
-- Select all tables from the source database for migration.
-- Start the migration and monitor per-table progress until all tables report **Completed**.
+- Add the **`Azure.AI.OpenAI`** NuGet package (v2.x).
+- Add a `CourseAiSuggestion` DTO with `Description`, `LearningObjectives` (`IList<string>`), and `AltText`.
+- Add an `ICourseContentAiService` interface and a `CourseContentAiService` implementation that:
+  - Builds an `AzureOpenAIClient` using `DefaultAzureCredential`.
+  - Sends a **vision** chat-completion request, embedding the uploaded image as a base64 `data:` URI in an `image_url` content part.
+  - Asks the model to return **JSON** (use `ChatResponseFormat.CreateJsonObjectFormat()`) matching the `CourseAiSuggestion` shape.
+  - Deserializes the response and returns the DTO (returns `null` on failure — the AI step must never block the upload).
+- Register the service and client in `Program.cs` (singleton, reads endpoint/deployment from configuration).
+- Add an `AltText` column to the `Course` model.
+- Modify `CoursesController.Create` and `Edit` POST: after the blob upload succeeds, call `ICourseContentAiService.AnalyzeAsync(...)` with the just-uploaded image bytes and MIME type, and stash the suggestion into `TempData`. If `Course.AltText` or `Course.Title` are empty, prefill them.
+- Update `Views/Courses/Create.cshtml` and `Edit.cshtml` to render a **"Review AI suggestions"** panel above the submit button when `TempData["AiSuggestion"]` is present (suggested description, bullet list of learning objectives, suggested alt text, an "Accept" button, and a "Regenerate" link that POSTs to a new action).
+- Update `Views/Courses/Details.cshtml` so the `<img alt="...">` attribute uses `Model.AltText` when present.
 
-**Validation**
+> **Hint:** The Azure OpenAI vision API expects the image as a content part of type `image_url`. When the image is in Blob Storage, fetch the bytes via `BlobClient.DownloadContentAsync()` and pass them as a base64 `data:` URI — this works whether the blob is public or private.
 
-- After the migration completes, connect to the Azure SQL target database using `sqlcmd` or the Azure Portal Query editor.
-- Run row-count queries to confirm that each table's record count matches the source.
-- Run a foreign-key integrity check to confirm no orphaned records were introduced.
-- Open the deployed Container App and navigate to the Students, Courses, and Departments pages — the seed data from the legacy database should be visible.
+> **Hint:** Use `ChatResponseFormat.CreateJsonObjectFormat()` and instruct the model in the system prompt to reply with a JSON object matching your DTO. Without this, parsing will break the first time the model adds prose around the JSON.
 
-**Connection hygiene**
-
-- Confirm that no SQL admin passwords appear in `appsettings.json` or environment variables.
-- The application must connect to Azure SQL using `Authentication=Active Directory Default` (local dev) or `Authentication=Active Directory Managed Identity` (Container App) — not a username/password pair.
-
-> **Hint:** Run `terraform output` inside `Resources/dotnet/infra/aca/` to retrieve the Azure SQL Server FQDN and database name provisioned in Challenge 03.
-
-> **Hint:** LocalDB uses a named pipe transport rather than TCP/IP, which can prevent the DMS Integration Runtime from connecting directly. If the DMS migration agent cannot reach LocalDB, use the `sqlpackage` CLI as a fallback: export a `.bacpac` from LocalDB, then import it into Azure SQL Database.
-
-> **Hint:** If the target database already contains tables or rows (from a previous `Database.Migrate()` run), truncate the target tables before starting the DMS migration, or enable the "overwrite existing data" option in the wizard to avoid duplicate-key errors.
-
-> **Hint:** The `dbo.__EFMigrationsHistory` table tracks which EF Core migrations have been applied. Include it in the DMS table selection so the application does not try to re-run migrations on the already-populated database.
+> **Hint:** Wrap the entire AI call in `try/catch` and `ILogger.LogWarning(...)` on failure. The user must always be able to save the course — even if Azure OpenAI is throttled, the deployment is wrong, or the role assignment has not yet propagated.
 
 ## Success Criteria
 
 To complete this challenge, demonstrate:
 
-- The DMS assessment report shows **0 blocking issues** for the source database.
-- All application tables (`Person`, `Course`, `Enrollment`, `Department`, `OfficeAssignment`, `CourseAssignment`, `Notification`) are present in the Azure SQL target with **row counts matching the source**.
-- A foreign-key integrity spot-check on the `Enrollment` table returns **0 orphaned rows**.
-- The deployed ContosoUniversity Container App displays the migrated data (students, courses, departments) when browsed — no re-seeding required.
-- `appsettings.json` and all Container App environment variables contain **no SQL admin passwords** — only Managed Identity or Azure AD authentication is used.
+- `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a role assignment of `Cognitive Services OpenAI User` to the Container App's managed identity.
+- The Container App has the env vars `AzureOpenAI__Endpoint` and `AzureOpenAI__Deployment` (and **no** OpenAI key anywhere — `az containerapp show` should not reveal one).
+- Uploading a teaching-material image on **Create** or **Edit** triggers a successful chat-completion call (visible in Azure OpenAI metrics or App Insights dependency tracking).
+- The Review AI suggestions panel renders a description, a learning-objectives list, and an alt text. The admin can accept (the data is persisted) or regenerate.
+- The Course Details page renders the persisted `AltText` in the `<img alt>` attribute.
+- If the Azure OpenAI endpoint is temporarily unreachable, the upload still succeeds and the Course is saved without AI fields (graceful degradation).
 
 ## Learning Resources
 
-- [Azure Database Migration Service overview](https://learn.microsoft.com/azure/dms/dms-overview)
-- [Tutorial: Migrate SQL Server to Azure SQL Database (offline)](https://learn.microsoft.com/azure/dms/tutorial-sql-server-to-azure-sql)
-- [Database Migration Assistant (DMA) overview](https://learn.microsoft.com/sql/dma/dma-overview)
-- [sqlpackage Export action (BACPAC)](https://learn.microsoft.com/sql/tools/sqlpackage/sqlpackage-export)
-- [sqlpackage Import action (BACPAC)](https://learn.microsoft.com/sql/tools/sqlpackage/sqlpackage-import)
-- [Azure SQL Database authentication modes](https://learn.microsoft.com/azure/azure-sql/database/logins-create-manage)
-- [EF Core — applying migrations](https://learn.microsoft.com/ef/core/managing-schemas/migrations/applying)
+- [Azure OpenAI Service overview](https://learn.microsoft.com/azure/ai-services/openai/overview)
+- [`Azure.AI.OpenAI` for .NET on NuGet](https://www.nuget.org/packages/Azure.AI.OpenAI)
+- [Use vision-enabled chat completions](https://learn.microsoft.com/azure/ai-services/openai/how-to/gpt-with-vision)
+- [Structured outputs with JSON response format](https://learn.microsoft.com/azure/ai-services/openai/how-to/structured-outputs)
+- [`Cognitive Services OpenAI User` role](https://learn.microsoft.com/azure/ai-services/openai/how-to/role-based-access-control)
+- [`DefaultAzureCredential` — .NET](https://learn.microsoft.com/dotnet/azure/sdk/authentication/credential-chains)
+- [`azurerm_cognitive_account`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) and [`azurerm_cognitive_deployment`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_deployment) Terraform resources

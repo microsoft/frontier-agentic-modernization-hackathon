@@ -1,135 +1,68 @@
 [< Previous Challenge](./Challenge-05.md) - **[Home](../../README.md)**
 
-# Challenge 06 – Migrate the PhotoAlbum Database to Azure PostgreSQL
+# Challenge 06 – Infuse AI into PhotoAlbum (Stretch)
 
 ## Introduction
 
-The modernized PhotoAlbum runs on Spring Boot 3 / Java 21 in Azure Container Apps with Azure Database for PostgreSQL Flexible Server, Azure Key Vault, and Azure Blob Storage. However, the **production data** from the legacy application still lives in the Oracle XE database running as a Docker container. Before shutting down that container permanently, the data must be **migrated to Azure Database for PostgreSQL Flexible Server** with full fidelity.
+The modernized PhotoAlbum runs on Spring Boot 3.3 / Java 21 with PostgreSQL Flexible Server and Azure Key Vault. In this challenge you will **infuse Azure OpenAI** into the upload pipeline so every photo automatically gets:
 
-In this challenge you will use **Ora2Pg** — an offline Oracle-to-PostgreSQL schema/data converter — to export the legacy Oracle schema and data, then import it into Azure Database for PostgreSQL Flexible Server using `psql`. This is a lightweight, deterministic approach that avoids DMS complexity and works well for the Oracle → PostgreSQL migration path.
+- A short **caption**.
+- A list of **tags** (5–10).
+- An accessible **`alt` text** rendered on every gallery card and the detail view.
+
+The application calls **Azure OpenAI `gpt-4.1-mini` (vision)** using **Managed Identity** — no API keys in `application.properties`, env vars, or Key Vault.
 
 ## Description
 
-Perform a complete offline database migration from the legacy Oracle XE database to the Azure Database for PostgreSQL Flexible Server provisioned in Challenge 03.
+Extend the PhotoAlbum Java application end-to-end with vision-assisted metadata.
 
-**Prepare the source**
+**Infrastructure (Terraform under `Resources/java/infra/aca/`)**
 
-- Start the legacy Oracle stack (`docker compose up -d` in `Resources/java/PhotoAlbum-Java/`).
-- Ensure the Oracle `photoalbum` schema contains data by running the legacy application once and uploading at least 2–3 photos.
-- Note the row count in `photoalbum.photos` — you will verify this count matches after migration.
+- Add an `azurerm_cognitive_account` resource of kind `OpenAI`.
+- Add an `azurerm_cognitive_deployment` for the **`gpt-4.1-mini`** model.
+- Grant the Container App's **system-assigned managed identity** the `Cognitive Services OpenAI User` role on the OpenAI account.
+- Expose two new Container App env vars:
+  - `AZURE_OPENAI_ENDPOINT` → the OpenAI account endpoint.
+  - `AZURE_OPENAI_DEPLOYMENT` → the `gpt-4.1-mini` deployment name.
 
-**Install Ora2Pg**
+**Application code (under `Resources/java/PhotoAlbum-Java/`)**
 
-Ora2Pg is an Oracle-to-PostgreSQL converter. Install it on your local machine:
+- Add the **`com.azure:azure-ai-openai`** dependency to `pom.xml` (the BOM-managed `com.azure:azure-identity` is already transitively available, but add it explicitly if needed).
+- Add `caption` (`String`), `altText` (`String`), and `tags` (`String`, comma-joined for hack simplicity) to the `Photo` entity. Hibernate `ddl-auto=update` will evolve the schema.
+- Add a `PhotoAiSuggestion` DTO with `caption`, `altText`, and `List<String> tags`.
+- Add a `PhotoAiService` interface and `PhotoAiServiceImpl` implementation that:
+  - Builds an `OpenAIClient` with `OpenAIClientBuilder.credential(new DefaultAzureCredentialBuilder().build()).endpoint(endpoint).buildClient()`.
+  - Sends a chat-completion request with a vision content list (`ChatMessageTextContentItem` + `ChatMessageImageContentItem` built from a base64 `data:` URI).
+  - Asks the model for **JSON** matching `PhotoAiSuggestion` (use `ChatCompletionsJsonResponseFormat`).
+  - Returns `Optional<PhotoAiSuggestion>` — returns `Optional.empty()` on any failure.
+- Modify `PhotoServiceImpl.uploadPhoto`: after `ImageIO` dimension extraction and **before** `photoRepository.save(...)`, call `photoAiService.analyze(bytes, mimeType)` inside `try/catch`. Populate `photo.setCaption(...)`, `photo.setAltText(...)`, `photo.setTags(String.join(",", suggestion.tags()))`. Failures **must not** block the save.
+- Update `src/main/resources/templates/index.html` gallery cards: show `caption` under the filename, render tag badges, and use `altText` for the `<img alt>` attribute (fall back to `originalFileName` if null).
+- Update `src/main/resources/templates/detail.html`: add **Caption**, **Alt text**, and **Tags** rows in the info sidebar; bind `<img alt>` to `altText`.
+- Wire `azure.openai.endpoint` / `azure.openai.deployment` in `application.properties` (reading from env vars `AZURE_OPENAI_ENDPOINT` / `AZURE_OPENAI_DEPLOYMENT`).
 
-- **macOS**: `brew install ora2pg`
-- **Linux (Ubuntu/Debian)**: `sudo apt-get install -y perl cpanminus && sudo cpanm DBD::Oracle Ora2Pg` (or `sudo apt-get install -y ora2pg` if available)
-- **Windows**: Download from [Ora2Pg GitHub releases](https://github.com/darold/ora2pg/releases) or use WSL
+> **Hint:** The Java Azure OpenAI SDK takes the image as a `ChatMessageImageContentItem` constructed from a `ChatMessageImageUrl`. Build the URL string as `"data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(bytes)`. This works without making the image publicly addressable.
 
-Verify installation: `ora2pg --version`
+> **Hint:** To get reliable JSON back, set `chatCompletionsOptions.setResponseFormat(new ChatCompletionsJsonResponseFormat())` and instruct the model in the system prompt to emit a JSON object matching your DTO. Mention the word "JSON" in the system prompt — the SDK and service both require it.
 
-**Export the Oracle schema and data using Ora2Pg**
-
-Create an `ora2pg.conf` configuration file. Use the reference template from [Coach Resources](../../Coach/Resources/java/ora2pg.conf):
-
-```ini
-[ora2pg]
-# Oracle source connection
-ORACLE_HOME=/usr/lib/oracle/...  # or leave blank if sqlplus/Oracle libs are in PATH
-ORACLE_DSN=dbi:Oracle:host=localhost;sid=FREEPDB1
-ORACLE_USER=photoalbum
-ORACLE_PASSWORD=photoalbum
-
-# Export schema and data
-SCHEMA=PHOTOALBUM
-OWNER=photoalbum
-TYPE=TABLE,SEQUENCE,INDEX
-EXPORT_SCHEMA=1
-```
-
-Run Ora2Pg to generate a SQL dump:
-
-```bash
-ora2pg -c ora2pg.conf -o ./photoalbum.sql
-```
-
-This creates a PostgreSQL-compatible SQL script containing:
-- Table definitions (Oracle types mapped to PostgreSQL: `VARCHAR2` → `VARCHAR`, `BLOB` → `BYTEA`, etc.)
-- Sequences and indexes
-- Data insert statements
-
-**Migrate to Azure PostgreSQL**
-
-1. Get the Azure PostgreSQL Flexible Server connection details:
-   ```bash
-   cd Resources/java/infra/aca/
-   terraform output db_fqdn  # e.g., wth-photoalbum-db.postgres.database.azure.com
-   terraform output db_admin_username  # e.g., azureadmin@wth-photoalbum-db
-   ```
-
-2. Connect to Azure PostgreSQL using `psql` and import the SQL dump:
-   ```bash
-   export PGPASSWORD="<your-db-admin-password>"
-   psql -h <db-fqdn> -U <admin-user> -d photoalbum < photoalbum.sql
-   ```
-   (Replace placeholders with actual values from `terraform output`.)
-
-3. Monitor the import for errors (should complete without fatal errors).
-
-**Critical: protect the migrated data**
-
-- The modernized application has `spring.jpa.hibernate.ddl-auto=create` in `application.properties`. This value **drops and recreates all tables** on every application start — which would wipe the freshly migrated data.
-- Change this setting to `validate` before starting or redeploying the modernized application against the populated PostgreSQL database.
-
-**Validation**
-
-- Connect to the Azure PostgreSQL target using `psql` or the Azure Portal Query editor.
-- Run row-count queries to confirm the `photos` table count matches the Oracle source.
-- Spot-check that image binary data (`photo_data` column) was converted from Oracle `BLOB` to PostgreSQL `BYTEA` correctly.
-- Start the modernized application pointing at Azure PostgreSQL and confirm the photo gallery loads with the migrated photos.
-
-**Decommission the legacy database**
-
-- Once the migrated data is validated and the modernized application is running on Azure, stop and remove the Oracle Docker container:
-  ```bash
-  docker compose down -v
-  ```
-- This is the definitive proof that the migration succeeded and the legacy system is no longer needed.
-
-> **Hint:** Run `terraform output db_fqdn` inside `Resources/java/infra/aca/` to retrieve the PostgreSQL Flexible Server hostname provisioned in Challenge 03.
-
-> **Hint:** If you encounter `psql: error: FATAL: SSL connection error`, or similar SSL issues, add `-sslmode=disable` to your `psql` command: `psql -h <db-fqdn> ... -sslmode=disable < photoalbum.sql` or disable SSL in Azure Portal (Connection Security).
-
-> **Hint:** If Ora2Pg cannot connect to Oracle, ensure:
->   - The Oracle container is running: `docker ps | grep oracle-db`
->   - Oracle is listening on port 1521: `netstat -an | grep 1521` or `ss -an | grep 1521`
->   - The TNS connection string is correct: `ORACLE_DSN=dbi:Oracle:host=localhost;sid=FREEPDB1`
->   - Oracle `photoalbum` user credentials are correct (default password often same as username)
-
-> **Hint:** Set `spring.jpa.hibernate.ddl-auto=validate` (or pass the env var `SPRING_JPA_HIBERNATE_DDL_AUTO=validate`) **before** pointing the application at the populated PostgreSQL database. With `create`, Hibernate will silently destroy all migrated data on the first application start.
-
-> **Hint:** Ora2Pg automatically converts Oracle `BLOB` to PostgreSQL `BYTEA`. The entity definition does not need to change; Hibernate handles both transparently.
+> **Hint:** Wrap the AI call in `try/catch (Exception e)` and `logger.warn(...)`. If Azure OpenAI is throttled or unreachable, the upload must still succeed — the photo just gets saved without AI fields. Add a `POST /photo/{id}/reanalyze` endpoint as an optional backfill action.
 
 ## Success Criteria
 
 To complete this challenge, demonstrate:
 
-- Ora2Pg successfully exports the `PHOTOALBUM` schema and `photos` table data to a SQL file without errors.
-- The SQL file imports into Azure PostgreSQL without fatal errors.
-- The `photos` table in Azure PostgreSQL has a **row count matching the Oracle source** — verified with a `SELECT COUNT(*) FROM photos` query on both sides.
-- The `photo_data` column in PostgreSQL contains `BYTEA` data (not null) for rows that had blobs in Oracle.
-- The deployed PhotoAlbum Container App displays the migrated photos in the gallery — no re-upload required.
-- `spring.jpa.hibernate.ddl-auto` is set to `validate` (not `create`) in the running configuration — confirmed via `az containerapp show`.
-- The Oracle Docker container has been **stopped and removed** (`docker ps` shows no `oracle-db` container).
-- No database passwords appear in plain text in `application.properties` or Container App environment variables — credentials come from Azure Key Vault.
+- `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a `Cognitive Services OpenAI User` role assignment to the Container App's managed identity.
+- The Container App has the env vars `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — and **no** OpenAI key. `az containerapp show` confirms.
+- Uploading a photo persists a non-null `caption`, an `altText`, and **at least 3 tags** in PostgreSQL. Run a quick `SELECT id, caption, alt_text, tags FROM photos ORDER BY uploaded_at DESC LIMIT 1;` to confirm.
+- The gallery page (`/`) renders caption + tag badges on each card.
+- The detail page renders caption, alt text, and tags in the sidebar; the `<img alt>` attribute reflects the AI-generated alt text (inspect element to verify).
+- Disabling the Azure OpenAI account or removing the role still allows a photo to be uploaded — only the AI fields are missing. App logs show a `WARN` for the failed call.
 
 ## Learning Resources
 
-- [Ora2Pg Documentation](https://github.com/darold/ora2pg)
-- [Ora2Pg Installation Guide](https://ora2pg.darold.net/installation.html)
-- [Ora2Pg Configuration Reference](https://ora2pg.darold.net/configuration.html)
-- [Oracle to PostgreSQL data type mapping reference](https://learn.microsoft.com/azure/postgresql/migrate/how-to-migrate-from-oracle#data-types)
-- [Azure Database for PostgreSQL Flexible Server overview](https://learn.microsoft.com/azure/postgresql/flexible-server/overview)
-- [Self-hosted Integration Runtime installation](https://learn.microsoft.com/azure/data-factory/create-self-hosted-integration-runtime)
-- [`psql` — PostgreSQL interactive terminal](https://www.postgresql.org/docs/current/app-psql.html)
-- [Hibernate `ddl-auto` reference](https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)
+- [Azure OpenAI Service overview](https://learn.microsoft.com/azure/ai-services/openai/overview)
+- [`azure-ai-openai` Java SDK](https://learn.microsoft.com/java/api/overview/azure/ai-openai-readme)
+- [Use vision-enabled chat completions](https://learn.microsoft.com/azure/ai-services/openai/how-to/gpt-with-vision)
+- [Structured outputs with JSON response format](https://learn.microsoft.com/azure/ai-services/openai/how-to/structured-outputs)
+- [`Cognitive Services OpenAI User` role](https://learn.microsoft.com/azure/ai-services/openai/how-to/role-based-access-control)
+- [`DefaultAzureCredential` — Java](https://learn.microsoft.com/azure/developer/java/sdk/identity-azure-hosted-auth)
+- [`azurerm_cognitive_account`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) and [`azurerm_cognitive_deployment`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_deployment) Terraform resources

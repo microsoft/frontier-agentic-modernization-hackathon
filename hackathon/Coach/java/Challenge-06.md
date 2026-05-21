@@ -1,265 +1,189 @@
-# Coach Guide – Challenge 06: Migrate the Database to Azure (Java Track)
+# Coach Guide – Challenge 06: Infuse AI into PhotoAlbum (Java Track) — Stretch
 
 ## Purpose
 
-This challenge takes the squad through a **production-grade data migration** from the Oracle XE database (running as a Docker container in the legacy stack) to the Azure Database for PostgreSQL Flexible Server provisioned in Challenge 03. Students use **Ora2Pg** — an offline Oracle-to-PostgreSQL converter — to export the schema and data, then import it using `psql`. This is a lightweight, deterministic approach that avoids DMS complexity and works well for the Oracle → PostgreSQL migration path. This is the final capstone step: all application state now lives in a managed, fully cloud-native PostgreSQL service.
+This is the **stretch AI-infusion challenge** for the Java track (optional, attempt only if the squad finishes Challenge 05 with time to spare). The squad extends the modernized PhotoAlbum so every photo upload triggers a vision call to Azure OpenAI and is auto-tagged. End-to-end: Terraform (Azure OpenAI account + model deployment + RBAC), Java service code (`azure-ai-openai`, `DefaultAzureCredentialBuilder`, structured JSON), Thymeleaf template updates, and verification in Azure.
 
-A working reference for the Azure infrastructure already lives in `Coach/Resources/java/infra/aca/`. The `azurerm_postgresql_flexible_server` resource provisioned there is the migration target.
-
----
+A working reference implementation lives under `Coach/Resources/java/PhotoAlbum-Java/` and `Coach/Resources/java/infra/aca/`. Use it to diff against student work, not as a hand-out.
 
 ## Mini-Lecture (10 min before challenge)
 
 Cover:
 
-- **Why data migration is a separate concern from code modernisation.** Challenges 02–05 moved the application stack. This challenge moves the *data* — a required step before decommissioning the Oracle container.
-- **Oracle → PostgreSQL: key differences to be aware of:**
-  - *Sequences vs `AUTO_INCREMENT` / `SERIAL` / `GENERATED ALWAYS AS IDENTITY`*: Oracle uses explicit named sequences; Hibernate ORM abstracts these, but raw SQL scripts need adjustment. Ora2Pg converts these automatically.
-  - *Data type mappings*: `VARCHAR2` → `VARCHAR`, `NUMBER` → `NUMERIC`/`INTEGER`, `CLOB`/`BLOB` → `TEXT`/`BYTEA`, `DATE` (with time) → `TIMESTAMP`. Ora2Pg handles these mappings.
-  - *`ROWNUM` vs `LIMIT`*: Oracle pagination idiom differs; not relevant here since the app uses Hibernate, but relevant for any native queries.
-  - *Case sensitivity*: Oracle identifiers are case-insensitive by default; PostgreSQL lowercases unquoted identifiers. Ora2Pg preserves quoting where necessary.
-- **Ora2Pg for Oracle → PostgreSQL:**
-  - Ora2Pg is a **Perl-based offline converter** that exports Oracle schema and data to PostgreSQL-compatible SQL scripts.
-  - No runtime network dependency like DMS; runs locally against the Oracle container and generates a SQL file.
-  - The generated SQL is deterministic and repeatable; students can run it multiple times without side effects (idempotent).
-  - Limitations: Does not convert triggers, stored procedures, or packages (not relevant for PhotoAlbum, which uses Hibernate).
-- **Hibernate `ddl-auto` lifecycle:** The modernized app sets `spring.jpa.hibernate.ddl-auto=create`, which drops and recreates the schema on every cold start. After the data migration, students must switch this to `validate` or `none` to preserve the migrated data.
-- **Connection string hygiene:** Credentials must come from Azure Key Vault (already wired in Challenge 04), not hardcoded in `application.properties`.
+- **Why Managed Identity beats API keys** for Azure OpenAI: no secrets, role-based revocation, audit trail. Tie it back to Challenge-04's Key Vault + MI work.
+- **Vision chat completions structure**: a single user message whose content is a `List<ChatMessageContentItem>` with a `ChatMessageTextContentItem` (instructions) and a `ChatMessageImageContentItem` whose `imageUrl` is a base64 `data:` URI.
+- **Structured outputs** via `ChatCompletionsJsonResponseFormat`. Stress that the system prompt must contain the literal word "JSON" or the service refuses.
+- **Graceful degradation**: the AI call is non-critical. `Optional.empty()` on failure; `try/catch` around the call; `WARN` log; the upload completes.
+- **Cost & model choice**: `gpt-4.1-mini` is vision-capable, fast, cheap. Available in Sweden Central and East US 2 — match Challenge-03's region.
 
----
+## Pinned SDK & model versions
 
-## Pre-requisites
-
-| Tool | Install / Notes |
+| Component | Pinned version |
 |---|---|
-| Oracle XE container running | `docker compose up -d` in `Resources/java/PhotoAlbum-Java/` |
-| **Ora2Pg** | `brew install ora2pg` (macOS) or `sudo apt-get install ora2pg` (Linux) or [GitHub releases](https://github.com/darold/ora2pg/releases) (Windows/WSL) |
-| `psql` CLI (import + validation) | `sudo apt-get install postgresql-client` or [Windows installer](https://www.postgresql.org/download/windows/) |
-| Azure CLI | already installed from Challenge 00 |
-| Java application seeded with data | Run the legacy Oracle-backed app at least once to populate the `photos` table |
+| `com.azure:azure-ai-openai` | `1.0.0-beta.16` (or latest beta) |
+| `com.azure:azure-identity` | managed by `spring-cloud-azure-dependencies` 5.18.0 BOM |
+| Azure OpenAI model | `gpt-4.1-mini` |
+| AzureRM Terraform provider | `~> 3.0` (already in use) |
 
-The squad must have completed Challenge 03 (`terraform apply` succeeded) so the PostgreSQL Flexible Server and `photoalbum` database exist.
+## Reference Terraform additions
 
----
+In [`Coach/Resources/java/infra/aca/main.tf`](../Resources/java/infra/aca/main.tf):
 
-## Expected Findings / Key Steps
-
-### 1 — Start the legacy Oracle stack and seed data
-
-```bash
-cd Resources/java/PhotoAlbum-Java
-docker compose up -d
-```
-
-Wait ~60 seconds for Oracle XE to be ready (check with `docker compose logs oracle-db`). The `photoalbum` schema is created by the init scripts in `oracle-init/`. Run the legacy application against Oracle once to populate the `photos` table:
-
-```bash
-# Switch to Oracle datasource temporarily (see legacy docker-compose.yml env vars)
-./mvnw spring-boot:run
-```
-
-Upload 2–3 photos through the UI (`http://localhost:8080`), then stop the application. Confirm data in Oracle:
-
-```bash
-# Connect to Oracle with SQL*Plus to confirm data
-sqlplus photoalbum/photoalbum@localhost:1521/FREEPDB1 <<'EOF'
-SELECT COUNT(*) FROM photoalbum.photos;
-EXIT;
-EOF
-```
-
-Expected: ≥ 2 rows.
-
-### 2 — Run Ora2Pg to export schema and data
-
-Have students copy the reference `ora2pg.conf` from `Coach/Resources/java/ora2pg.conf` and customize the connection details:
-
-```bash
-# Navigate to the repository root
-cd ~/PhotoAlbum-Java  # or wherever they cloned it
-
-# Copy the template
-cp ../../Coach/Resources/java/ora2pg.conf . # or download from coach resources
-
-# Edit ora2pg.conf: update ORACLE_DSN, ORACLE_USER, ORACLE_PASSWORD if needed
-# Default: ORACLE_DSN=dbi:Oracle:host=localhost;sid=FREEPDB1, user/pass = photoalbum
-
-# Run Ora2Pg
-ora2pg -c ora2pg.conf -o ./photoalbum.sql
-```
-
-Expected output: `photoalbum.sql` file created with ~500–1000 lines (depends on photo count).
-
-Common issues:
-- **`Can't connect to Oracle`**: Check Oracle container is running (`docker ps`), verify `ORACLE_DSN`, ensure `photoalbum` user exists.
-- **`Missing Perl modules`**: Install `DBD::Oracle` manually: `sudo cpanm DBD::Oracle`.
-- **Permission denied on output**: Ensure write permissions in the current directory.
-
-### 3 — Import into Azure PostgreSQL using psql
-
-Have students retrieve the Azure PostgreSQL connection details:
-   Username: photoalbum   Password: photoalbum
-   ```
-4. Select the `PHOTOALBUM` schema.
-5. Click **Run assessment** and review the report.
-
-**Expected assessment result:**
-
-| Finding | Explanation |
-|---|---|
-| `photos` table — `BLOB` column (`photo_data`) | Maps to `BYTEA` in PostgreSQL. DMS handles the conversion automatically. |
-| UUID stored as `VARCHAR(36)` | Maps to `VARCHAR(36)` in PostgreSQL. No issue. |
-| `TIMESTAMP DEFAULT CURRENT_TIMESTAMP` | Supported natively in PostgreSQL. |
-| No stored procedures, packages, or triggers | This schema is Hibernate-managed; no PL/SQL artifacts. |
-
-Students should see **0 blockers**. If the assessment flags the `BLOB` column as a warning, explain that this is informational — DMS will convert `BLOB` to `BYTEA` automatically for the migration.
-
-> **Note for coaches:** If students added `caption`, `altText`, and `tags` columns in Challenge 05, those are plain `VARCHAR` columns and present no migration concerns.
-
-### 3 — Create the DMS migration project
-
-1. In the Azure Database Migration Service wizard, select **Oracle → Azure Database for PostgreSQL Flexible Server**.
-2. **Target connection:**
-   - Host: `<postgres-fqdn>` (from `terraform output db_fqdn` in `Resources/java/infra/aca/`)
-   - Port: `5432`
-   - Database: `photoalbum`
-   - Username / Password: from Key Vault (`db-username`, `db-password`) or Terraform variables.
-3. **Migration mode:** Offline.
-4. **Schema selection:** Select the `PHOTOALBUM` schema → `photos` table.
-5. **DMS Integration Runtime:** Install the self-hosted Integration Runtime on the local machine (the same machine running the Oracle container). Follow the wizard's guided installation steps.
-6. Start migration.
-
-### 4 — Monitor migration progress
-
-DMS shows per-table row counts and status. The `photos` table should complete within seconds for a small dataset.
-
-Common error patterns:
-
-**"ORA-01017: invalid username/password"**  
-The Oracle container's `photoalbum` user credentials. Verify with `sqlplus photoalbum/photoalbum@localhost:1521/FREEPDB1`.
-
-**"FATAL: password authentication failed for user"** (PostgreSQL side)  
-The Key Vault secret `db-password` does not match what Terraform set on the Flexible Server. Retrieve the actual password with:
-```bash
-az keyvault secret show --vault-name <kv-name> --name db-password --query value -o tsv
-```
-and compare with `az postgres flexible-server show`.
-
-**"column photo_data is of type bytea but expression is of type oid"**  
-DMS version mismatch. Update to the latest DMS release; the BLOB→BYTEA conversion is fixed in DMS 6.x+.
-
-### 5 — Prevent Hibernate from wiping the migrated data
-
-**Critical step.** The modernized app sets `spring.jpa.hibernate.ddl-auto=create`, which drops and recreates tables on every startup. Change this to `validate` before running the modernized app against the populated PostgreSQL database:
-
-In `Resources/java/PhotoAlbum-Java/src/main/resources/application.properties`:
-
-```properties
-# BEFORE migration
-spring.jpa.hibernate.ddl-auto=create
-
-# AFTER migration — preserves existing data
-spring.jpa.hibernate.ddl-auto=validate
-```
-
-If using Azure Container Apps, update the `JAVA_OPTS` or use an environment variable override:
 ```hcl
-env {
-  name  = "SPRING_JPA_HIBERNATE_DDL_AUTO"
-  value = "validate"
+resource "azurerm_cognitive_account" "openai" {
+  name                  = "${var.prefix}-aoai-${local.suffix}"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  kind                  = "OpenAI"
+  sku_name              = "S0"
+  custom_subdomain_name = "${var.prefix}-aoai-${local.suffix}"
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+resource "azurerm_cognitive_deployment" "gpt41_mini" {
+  name                 = "gpt-4.1-mini"
+  cognitive_account_id = azurerm_cognitive_account.openai.id
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-4.1-mini"
+    version = "2025-04-14"
+  }
+
+  sku {
+    name     = "GlobalStandard"
+    capacity = 50
+  }
+}
+
+resource "azurerm_role_assignment" "aoai_user" {
+  scope                = azurerm_cognitive_account.openai.id
+  role_definition_name = "Cognitive Services OpenAI User"
+  principal_id         = azurerm_container_app.photoalbum.identity[0].principal_id
 }
 ```
 
-### 6 — Validate the migration
+Add to the `template { container { ... } }` block of `azurerm_container_app.photoalbum`:
 
-Connect to the Azure PostgreSQL target using `psql` and run:
+```hcl
+env {
+  name  = "AZURE_OPENAI_ENDPOINT"
+  value = azurerm_cognitive_account.openai.endpoint
+}
 
-```sql
--- Row count validation
-SELECT 'photos' AS table_name, COUNT(*) AS row_count FROM photos;
-
--- Sample data spot-check
-SELECT id, original_file_name, mime_type, file_size, uploaded_at
-FROM photos
-ORDER BY uploaded_at DESC
-LIMIT 5;
-
--- BYTEA column integrity: confirm photo_data is not null for rows that had blobs
-SELECT COUNT(*) AS rows_with_photo_data
-FROM photos
-WHERE photo_data IS NOT NULL;
+env {
+  name  = "AZURE_OPENAI_DEPLOYMENT"
+  value = azurerm_cognitive_deployment.gpt41_mini.name
+}
 ```
 
-The counts and sample data must match the Oracle source counts from step 1.
+## Reference Java snippets
 
-### 7 — Point the modernized application at the migrated data
+`src/main/java/com/photoalbum/dto/PhotoAiSuggestion.java`:
 
-The Container App provisioned in Challenge 03 already connects to Azure PostgreSQL using the env vars `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD` (sourced from Key Vault via Challenge 04). After changing `ddl-auto` to `validate` and redeploying, the application reads the migrated data directly.
-
-Local development verification:
-
-```bash
-# Set env vars to point at Azure PostgreSQL
-export DB_HOST=<postgres-fqdn>
-export DB_PORT=5432
-export DB_NAME=photoalbum
-export DB_USERNAME=photoalbum
-export DB_PASSWORD=<from-keyvault>
-export SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-
-./mvnw spring-boot:run
+```java
+public record PhotoAiSuggestion(String caption, String altText, java.util.List<String> tags) {}
 ```
 
-Navigate to `http://localhost:8080` — the photos uploaded to Oracle should appear in the gallery.
+`src/main/java/com/photoalbum/service/PhotoAiService.java`:
 
-### 8 — Decommission the Oracle container
-
-Once validation passes and the modernized app is confirmed to read from Azure PostgreSQL:
-
-```bash
-docker compose down -v   # removes Oracle container + volumes
+```java
+public interface PhotoAiService {
+    java.util.Optional<PhotoAiSuggestion> analyze(byte[] imageBytes, String mimeType);
+}
 ```
 
-This is the final proof that the migration is complete and the legacy database is no longer needed.
+`PhotoAiServiceImpl` essentials:
 
----
+```java
+OpenAIClient client = new OpenAIClientBuilder()
+    .endpoint(endpoint)
+    .credential(new DefaultAzureCredentialBuilder().build())
+    .buildClient();
+
+String dataUri = "data:" + mimeType + ";base64,"
+    + java.util.Base64.getEncoder().encodeToString(imageBytes);
+
+var messages = java.util.List.of(
+    new ChatRequestSystemMessage(
+        "You assist a photo gallery. Inspect the image and return ONLY a JSON object " +
+        "with this exact shape: " +
+        "{ \"caption\": string, \"altText\": string, \"tags\": string[] }. " +
+        "Caption < 120 chars. altText is an accessibility description. " +
+        "Provide 5 to 10 tags (single lowercase words)."),
+    new ChatRequestUserMessage(java.util.List.of(
+        new ChatMessageTextContentItem("Describe this photo."),
+        new ChatMessageImageContentItem(new ChatMessageImageUrl(dataUri))))
+);
+
+var options = new ChatCompletionsOptions(messages)
+    .setResponseFormat(new ChatCompletionsJsonResponseFormat())
+    .setTemperature(0.2)
+    .setMaxTokens(500);
+
+ChatCompletions resp = client.getChatCompletions(deployment, options);
+String json = resp.getChoices().get(0).getMessage().getContent();
+PhotoAiSuggestion s = new ObjectMapper().readValue(json, PhotoAiSuggestion.class);
+return Optional.of(s);
+```
+
+Integration in `PhotoServiceImpl.uploadPhoto` (after dimensions extraction, before `photoRepository.save`):
+
+```java
+try {
+    photoAiService.analyze(photoData, file.getContentType()).ifPresent(s -> {
+        photo.setCaption(s.caption());
+        photo.setAltText(s.altText());
+        photo.setTags(s.tags() == null ? null : String.join(",", s.tags()));
+    });
+} catch (Exception e) {
+    logger.warn("AI analysis failed for {} — saving without AI metadata", file.getOriginalFilename(), e);
+}
+```
+
+`application.properties`:
+
+```properties
+azure.openai.endpoint=${AZURE_OPENAI_ENDPOINT:}
+azure.openai.deployment=${AZURE_OPENAI_DEPLOYMENT:gpt-4.1-mini}
+```
 
 ## Common Pitfalls
 
-| Symptom | Root Cause | Coaching Hint |
-|---|---|---|
-| DMS cannot connect to Oracle | Oracle XE container not running or not yet ready | Run `docker compose ps` and `docker compose logs oracle-db`; wait for "DATABASE IS READY TO USE" in logs |
-| `ORA-12541: No listener` | Oracle listener not started inside container | Restart with `docker compose restart oracle-db`; listener starts automatically after ~45 s |
-| PostgreSQL target shows empty `photos` table after app starts | `ddl-auto=create` wiped the migrated data on app startup | Change to `ddl-auto=validate` **before** starting the modernized app after migration |
-| `photo_data BYTEA` shows null for all rows | Migration ran before photos were uploaded | Seed Oracle with at least one photo upload first, then re-run DMS migration |
-| `relation "photos" does not exist` (PostgreSQL error) | Hibernate schema not yet created on target | Run app once with `ddl-auto=create` on empty target to create schema, then wipe and migrate data again (or use `ddl-auto=none` and create schema via DDL export from DMS assessment) |
-| Self-hosted Integration Runtime install fails | .NET 6 runtime not present on the migration machine | Install .NET 6 runtime: `sudo apt-get install -y dotnet-runtime-6.0` on Linux |
-| Row count mismatch after migration | Concurrent inserts during offline migration window | Acceptable for a hackathon. In production, quiesce the application before offline migration |
-| `application.properties` still contains `spring.datasource.password=photoalbum` | Key Vault integration removed during testing | Restore `spring.datasource.password=${DB_PASSWORD:${azure.keyvault.db-password:photoalbum}}` |
-
----
-
-## Success Criteria
-
-| Criterion | Notes |
+| Issue | Hint to give |
 |---|---|
-| DMS assessment shows 0 blockers | Students must show the assessment report |
-| All rows in `photos` table match source row count | Verified by validation query in step 6 |
-| `photo_data` BLOB→BYTEA conversion complete | Spot-check query returns count > 0 (if photos were uploaded) |
-| Application running against Azure PostgreSQL shows gallery with migrated photos | Visit `/` in the deployed Container App |
-| `spring.jpa.hibernate.ddl-auto` is `validate` (not `create`) in the deployed configuration | Check env vars in Container App: `az containerapp show --name ... --query "properties.template.containers[0].env"` |
-| Oracle Docker container is stopped and removed | `docker ps` shows no `oracle-db` container |
-| No database credentials in `application.properties` or Container App env vars in plain text | Passwords must come from Key Vault or Managed Identity |
+| `401 Unauthorized` from Azure OpenAI right after `terraform apply` | RBAC propagation takes 1–2 minutes. Retry instead of debugging. |
+| `403 Forbidden` even after waiting | Role was assigned to the wrong principal. Confirm `principal_id = azurerm_container_app.photoalbum.identity[0].principal_id`. |
+| Jackson throws `JsonParseException` because the response has prose around the JSON | The student forgot `setResponseFormat(new ChatCompletionsJsonResponseFormat())`. Also: the system prompt must mention "JSON". |
+| `BadRequest: 'messages[1].content' value is invalid` | The `ChatRequestUserMessage` constructor for multi-part content expects `List<ChatMessageContentItem>`, not a `String`. Different constructor. |
+| `DefaultAzureCredential` works locally but fails in the Container App | `identity { type = "SystemAssigned" }` missing on the Container App, or the new revision was never deployed after Terraform changes. |
+| `gpt-4.1-mini` quota is 0 in this region | Switch region in `variables.tf` (Sweden Central / East US 2) or request quota in the portal. Coach has a fallback subscription. |
+| Hibernate doesn't add the new columns | Confirm `spring.jpa.hibernate.ddl-auto=update` (or `create`) in `application.properties` and the app was restarted. |
+| Thymeleaf error `EL1008E` on `${photo.tags}` | The getter must be `getTags()` and the field must be a real JPA column — not `@Transient`. |
+| Upload latency jumps from 200 ms to 8 s | This is expected — the AI call is synchronous. Discuss async/background queue as a future improvement, not a fix for the hack. |
+| `MalformedJsonException` reading `caption` field | Model occasionally returns `null` for fields. Make sure the DTO uses object (`String`) types, not primitives, and that `setCaption(null)` is acceptable. |
 
----
+## Success Criteria Notes
 
-## Learning Resources
+Award full credit when all five conditions hold:
 
-- [Azure Database Migration Service — Oracle to PostgreSQL](https://learn.microsoft.com/azure/dms/tutorial-oracle-azure-postgresql-online)
-- [Azure Database Migration Service overview](https://learn.microsoft.com/azure/dms/dms-overview)
-- [Oracle to Azure PostgreSQL migration guide](https://learn.microsoft.com/azure/postgresql/migrate/how-to-migrate-from-oracle)
-- [Oracle to PostgreSQL data type mapping](https://learn.microsoft.com/azure/postgresql/migrate/how-to-migrate-from-oracle#data-types)
-- [Azure Database for PostgreSQL Flexible Server overview](https://learn.microsoft.com/azure/postgresql/flexible-server/overview)
-- [Hibernate `ddl-auto` property reference](https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)
-- [Self-hosted Integration Runtime for DMS](https://learn.microsoft.com/azure/data-factory/create-self-hosted-integration-runtime)
-- [`psql` — PostgreSQL interactive terminal](https://www.postgresql.org/docs/current/app-psql.html)
+1. Azure OpenAI account + `gpt-4.1-mini` deployment exist via Terraform (not the portal).
+2. The Container App has only `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — **no key**.
+3. `az role assignment list --assignee <container-app-identity-principalId>` shows `Cognitive Services OpenAI User` on the OpenAI scope.
+4. New uploads have non-null `caption`, `alt_text`, and ≥3 `tags` in the `photos` table.
+5. Removing the role assignment still allows uploads to succeed (only AI fields are null) — verifies the `try/catch` is in place.
+
+Partial credit is fine for time-boxed squads — the priority is **Managed Identity + a working vision call + graceful degradation**. The reanalyze endpoint and tag badges in the UI are polish.
+
+## Time budget
+
+60–90 minutes:
+
+- 15 min: Terraform additions + `terraform apply`.
+- 25 min: `azure-ai-openai` integration (DTO + service + integration in `PhotoServiceImpl`).
+- 15 min: entity + repository (`ddl-auto=update` does the schema work).
+- 20 min: Thymeleaf template updates.
+- 15 min: build new image, push to ACR, deploy new revision, verify end-to-end.

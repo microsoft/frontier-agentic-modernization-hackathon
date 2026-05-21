@@ -36,9 +36,11 @@ Each challenge has a dedicated per-track guide. Pick **`dotnet/`** or **`java/`*
   - Java: migrate PhotoAlbum from Spring Boot 2.7 / Java 8 / Oracle to Spring Boot 3.x / Java 21 / PostgreSQL + Azure Blob Storage.
 - Challenge 03: **Containerize & Deploy to Azure Container Apps** — [.NET](Student/dotnet/Challenge-03.md) · [Java](Student/java/Challenge-03.md)
   - Package the modernized app as a container and deploy it to Azure using Terraform.
-- Challenge 04: **Observe, Validate & Secure** — [.NET](Student/dotnet/Challenge-04.md) · [Java](Student/java/Challenge-04.md)
+- Challenge 04: **Migrate the Database to Azure** — [.NET](Student/dotnet/Challenge-04.md) · [Java](Student/java/Challenge-04.md)
+  - Migrate legacy production data to the managed Azure target database and validate row parity + app behavior.
+- Challenge 05: **Observe & Secure** — [.NET](Student/dotnet/Challenge-05.md) · [Java](Student/java/Challenge-05.md)
   - Integrate Application Insights, secure secrets with Azure Key Vault and Managed Identity.
-- Challenge 05: **Infuse AI into the Application (Stretch)** — [.NET](Student/dotnet/Challenge-05.md) · [Java](Student/java/Challenge-05.md)
+- Challenge 06: **Infuse AI into the Application (Stretch)** — [.NET](Student/dotnet/Challenge-06.md) · [Java](Student/java/Challenge-06.md)
   - Add Azure OpenAI (vision, `gpt-4.1-mini`) with Managed Identity so the app generates course/photo metadata on upload.
 
 ## Prerequisites
@@ -109,8 +111,8 @@ hackathon/
 ├── README.md                ← This file (hack one-pager)
 ├── index.html               ← Card-based navigation for the hack
 ├── Student/
-│   ├── dotnet/              ← Challenge-00..05 for the .NET track
-│   ├── java/                ← Challenge-00..05 for the Java track
+│   ├── dotnet/              ← Challenge-00..06 for the .NET track
+│   ├── java/                ← Challenge-00..06 for the Java track
 │   └── Resources/           ← Sample apps + helper scripts per track
 └── Coach/
     ├── README.md            ← Coach guide and event logistics
