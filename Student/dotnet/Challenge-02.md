@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-01.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-03.md)
+[< Previous Challenge](./Challenge-01.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-03.md)
 
-# Challenge 02 – Modernize the .NET Application
+# Challenge 02 — Modernize the .NET Application
 
 ## Introduction
 
@@ -48,12 +48,14 @@ Your approach should include:
 
 To complete this challenge successfully, demonstrate:
 
-- `dotnet build` succeeds with no errors targeting .NET 10
-- `dotnet run` starts the application without runtime errors
-- The Notifications feature uses Azure Service Bus (show the `NotificationService.cs` using `ServiceBusClient`)
-- File upload functionality references Azure Blob Storage (show the upload controller using `BlobContainerClient`)
-- `modernize assess` on the updated codebase reports no remaining critical issues for the .NET Framework 4.8 → .NET 10 migration
-- No references to `System.Messaging`, `System.Web`, or `packages.config` remain
+1. `dotnet build` succeeds with no errors targeting .NET 10
+2. `dotnet run` starts the application without runtime errors
+3. The Notifications feature uses Azure Service Bus (show the `NotificationService.cs` using `ServiceBusClient`)
+4. File upload functionality references Azure Blob Storage (show the upload controller using `BlobContainerClient`)
+5. `modernize assess` on the updated codebase reports no remaining critical issues for the .NET Framework 4.8 → .NET 10 migration
+6. No references to `System.Messaging`, `System.Web`, or `packages.config` remain
+7. **Explain to your coach** — why was `System.Web` never ported to .NET Core? What does this mean for every controller, filter, and configuration that references it?
+8. **Explain to your coach** — what did `modernize plan execute` do that you could not have accomplished with a bulk find-and-replace?
 
 ## Learning Resources
 

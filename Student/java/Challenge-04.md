@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-03.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-05.md)
+[< Previous Challenge](./Challenge-03.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-05.md)
 
-# Challenge 04 – Migrate the PhotoAlbum Database to Azure PostgreSQL
+# Challenge 04 — Migrate the PhotoAlbum Database to Azure PostgreSQL
 
 ## Introduction
 
@@ -131,16 +131,17 @@ If your environment has Preview migration features enabled, you can also run:
 
 To complete this challenge, demonstrate:
 
-- Migration completes successfully using either valid path:
+1. Migration completes successfully using either valid path:
    - Path 1: Ora2Pg export + `psql` import, or
    - Path 2: Preview conversion workflow in VS Code PostgreSQL extension (`ms-ossdata.vscode-pgsql`).
-- If Path 2 is used, all flagged Review Tasks are addressed or documented before final validation.
-- The `photos` table in Azure PostgreSQL has a **row count matching the Oracle source** — verified with a `SELECT COUNT(*) FROM photos` query on both sides.
-- The `photo_data` column in PostgreSQL contains `BYTEA` data (not null) for rows that had blobs in Oracle.
-- The deployed PhotoAlbum Container App displays the migrated photos in the gallery — no re-upload required.
-- `spring.jpa.hibernate.ddl-auto` is set to `validate` (not `create`) in the running configuration — confirmed via `az containerapp show`.
-- The Oracle Docker container has been **stopped and removed** (`docker ps` shows no `oracle-db` container).
-- No database passwords appear in plain text in `application.properties` or Container App environment variables — credentials come from Azure Key Vault.
+2. If Path 2 is used, all flagged Review Tasks are addressed or documented before final validation.
+3. The `photos` table in Azure PostgreSQL has a **row count matching the Oracle source** — verified with a `SELECT COUNT(*) FROM photos` query on both sides.
+4. The `photo_data` column in PostgreSQL contains `BYTEA` data (not null) for rows that had blobs in Oracle.
+5. The deployed PhotoAlbum Container App displays the migrated photos in the gallery — no re-upload required.
+6. `spring.jpa.hibernate.ddl-auto` is set to `validate` (not `create`) in the running configuration — confirmed via `az containerapp show`.
+7. The Oracle Docker container has been **stopped and removed** (`docker ps` shows no `oracle-db` container).
+8. No database passwords appear in plain text in `application.properties` or Container App environment variables — credentials come from Azure Key Vault.
+9. **Explain to your coach** — what is the difference between the two migration paths (Ora2Pg vs. AI-assisted schema conversion)? In what situation would you choose each?
 
 ## Learning Resources
 

@@ -1,3 +1,5 @@
+**[Home](../../README.md)** | [Next Solution >](./Solution-01.md)
+
 # Coach Guide – Challenge 00: Prerequisites (.NET Track)
 
 ## Purpose

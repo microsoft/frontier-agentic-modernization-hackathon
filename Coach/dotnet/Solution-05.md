@@ -1,3 +1,5 @@
+[< Previous Solution](./Solution-04.md) | **[Home](../../README.md)** | [Next Solution >](./Solution-06.md)
+
 # Coach Guide – Challenge 05: Observe & Secure (.NET Track)
 
 ## Purpose

@@ -1,3 +1,5 @@
+[< Previous Solution](./Solution-03.md) | **[Home](../../README.md)** | [Next Solution >](./Solution-05.md)
+
 # Coach Guide – Challenge 04: Migrate the Database to Azure (Java Track)
 
 ## Purpose

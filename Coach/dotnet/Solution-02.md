@@ -1,3 +1,5 @@
+[< Previous Solution](./Solution-01.md) | **[Home](../../README.md)** | [Next Solution >](./Solution-03.md)
+
 # Coach Guide – Challenge 02: Modernize the .NET Application
 
 ## Purpose

@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-00.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-02.md)
+[< Previous Challenge](./Challenge-00.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-02.md)
 
-# Challenge 01 – Assess the Legacy .NET Application
+# Challenge 01 — Assess the Legacy .NET Application
 
 ## Introduction
 
@@ -30,9 +30,10 @@ Review the generated assessment report and discuss as a team:
 
 To complete this challenge successfully, demonstrate:
 
-- An assessment report exists for the ContosoUniversity (.NET) application
-- Your team can articulate the **top 3 migration blockers** for the application (dependencies, APIs, or patterns that require manual attention)
-- Your team has identified which modernization steps the tool can automate vs. which require manual intervention
+1. An assessment report exists for the ContosoUniversity (.NET) application
+2. Your team can articulate the **top 3 migration blockers** for the application (dependencies, APIs, or patterns that require manual attention)
+3. Your team has identified which modernization steps the tool can automate vs. which require manual intervention
+4. **Explain to your coach** — what is the difference between a **critical finding** and a **warning** in the `modernize assess` report? Which category would block you from proceeding with the migration?
 
 ## Learning Resources
 

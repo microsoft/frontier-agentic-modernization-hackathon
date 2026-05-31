@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-03.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-05.md)
+[< Previous Challenge](./Challenge-03.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-05.md)
 
-# Challenge 04 – Migrate the ContosoUniversity Database to Azure SQL
+# Challenge 04 — Migrate the ContosoUniversity Database to Azure SQL
 
 ## Introduction
 
@@ -50,11 +50,12 @@ Perform a complete offline database migration from the legacy ContosoUniversity 
 
 To complete this challenge, demonstrate:
 
-- The DMS assessment report shows **0 blocking issues** for the source database.
-- All application tables (`Person`, `Course`, `Enrollment`, `Department`, `OfficeAssignment`, `CourseAssignment`, `Notification`) are present in the Azure SQL target with **row counts matching the source**.
-- A foreign-key integrity spot-check on the `Enrollment` table returns **0 orphaned rows**.
-- The deployed ContosoUniversity Container App displays the migrated data (students, courses, departments) when browsed — no re-seeding required.
-- `appsettings.json` and all Container App environment variables contain **no SQL admin passwords** — only Managed Identity or Azure AD authentication is used.
+1. The DMS assessment report shows **0 blocking issues** for the source database.
+2. All application tables (`Person`, `Course`, `Enrollment`, `Department`, `OfficeAssignment`, `CourseAssignment`, `Notification`) are present in the Azure SQL target with **row counts matching the source**.
+3. A foreign-key integrity spot-check on the `Enrollment` table returns **0 orphaned rows**.
+4. The deployed ContosoUniversity Container App displays the migrated data (students, courses, departments) when browsed — no re-seeding required.
+5. `appsettings.json` and all Container App environment variables contain **no SQL admin passwords** — only Managed Identity or Azure AD authentication is used.
+6. **Explain to your coach** — what is the difference between an *offline* migration and an *online* migration? Why is an offline migration appropriate for this exercise?
 
 ## Learning Resources
 

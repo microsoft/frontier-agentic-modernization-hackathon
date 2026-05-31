@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-05.md) - **[Home](../../README.md)**
+[< Previous Challenge](./Challenge-05.md) — **[Home](../../README.md)**
 
-# Challenge 06 – Infuse AI into PhotoAlbum (Stretch)
+# Challenge 06 — Infuse AI into PhotoAlbum (Stretch)
 
 ## Introduction
 
@@ -50,12 +50,13 @@ Extend the PhotoAlbum Java application end-to-end with vision-assisted metadata.
 
 To complete this challenge, demonstrate:
 
-- `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a `Cognitive Services OpenAI User` role assignment to the Container App's managed identity.
-- The Container App has the env vars `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — and **no** OpenAI key. `az containerapp show` confirms.
-- Uploading a photo persists a non-null `caption`, an `altText`, and **at least 3 tags** in PostgreSQL. Run a quick `SELECT id, caption, alt_text, tags FROM photos ORDER BY uploaded_at DESC LIMIT 1;` to confirm.
-- The gallery page (`/`) renders caption + tag badges on each card.
-- The detail page renders caption, alt text, and tags in the sidebar; the `<img alt>` attribute reflects the AI-generated alt text (inspect element to verify).
-- Disabling the Azure OpenAI account or removing the role still allows a photo to be uploaded — only the AI fields are missing. App logs show a `WARN` for the failed call.
+1. `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a `Cognitive Services OpenAI User` role assignment to the Container App's managed identity.
+2. The Container App has the env vars `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — and **no** OpenAI key. `az containerapp show` confirms.
+3. Uploading a photo persists a non-null `caption`, an `altText`, and **at least 3 tags** in PostgreSQL. Run a quick `SELECT id, caption, alt_text, tags FROM photos ORDER BY uploaded_at DESC LIMIT 1;` to confirm.
+4. The gallery page (`/`) renders caption + tag badges on each card.
+5. The detail page renders caption, alt text, and tags in the sidebar; the `<img alt>` attribute reflects the AI-generated alt text (inspect element to verify).
+6. Disabling the Azure OpenAI account or removing the role still allows a photo to be uploaded — only the AI fields are missing. App logs show a `WARN` for the failed call.
+7. **Explain to your coach** — why must the AI service call be wrapped in `try/catch` and must never block the upload? What user-experience principle does this reflect?
 
 ## Learning Resources
 

@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-04.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-06.md)
+[< Previous Challenge](./Challenge-04.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-06.md)
 
-# Challenge 05 – Observe & Secure
+# Challenge 05 — Observe & Secure
 
 ## Introduction
 
@@ -32,10 +32,11 @@ Apply production hardening to the modernized Java PhotoAlbum application:
 
 To complete this challenge successfully, demonstrate:
 
-- Application Insights shows live telemetry (requests, dependencies, exceptions) from the Java application
-- No connection strings or credentials appear in any application config file, environment variable, or Terraform state
-- `az keyvault secret list` shows all connection strings stored in Key Vault
-- The Container App uses Managed Identity (confirm in Azure Portal → Container App → Identity)
+1. Application Insights shows live telemetry (requests, dependencies, exceptions) from the Java application
+2. No connection strings or credentials appear in any application config file, environment variable, or Terraform state
+3. `az keyvault secret list` shows all connection strings stored in Key Vault
+4. The Container App uses Managed Identity (confirm in Azure Portal → Container App → Identity)
+5. **Explain to your coach** — what does Managed Identity eliminate compared to storing a connection string in `application.properties`? What attack vector does it close?
 
 ## Learning Resources
 

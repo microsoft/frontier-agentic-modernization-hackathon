@@ -1,3 +1,5 @@
+[< Previous Solution](./Solution-00.md) | **[Home](../../README.md)** | [Next Solution >](./Solution-02.md)
+
 # Coach Guide – Challenge 01: Assess the Legacy .NET Application
 
 ## Purpose

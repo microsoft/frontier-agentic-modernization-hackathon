@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-02.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-04.md)
+[< Previous Challenge](./Challenge-02.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-04.md)
 
-# Challenge 03 – Containerize & Deploy the .NET App to Azure Container Apps
+# Challenge 03 — Containerize & Deploy the .NET App to Azure Container Apps
 
 ## Introduction
 
@@ -35,11 +35,12 @@ Containerize and deploy the modernized ContosoUniversity .NET application to Azu
 
 To complete this challenge successfully, demonstrate:
 
-- The container image builds successfully with `docker build`
-- `terraform apply` completes without errors
-- The ContosoUniversity .NET app is accessible at its Azure Container Apps URL and all CRUD operations work
-- Azure Portal shows active connections from the Container App to Azure SQL Database, Azure Service Bus, and Azure Blob Storage
-- No MSMQ or local file system dependencies remain anywhere in the infrastructure
+1. The container image builds successfully with `docker build`
+2. `terraform apply` completes without errors
+3. The ContosoUniversity .NET app is accessible at its Azure Container Apps URL and all CRUD operations work
+4. Azure Portal shows active connections from the Container App to Azure SQL Database, Azure Service Bus, and Azure Blob Storage
+5. No MSMQ or local file system dependencies remain anywhere in the infrastructure
+6. **Explain to your coach** — why must connection strings and credentials never be baked into the container image? How does your Terraform configuration handle secret injection at runtime?
 
 ## Learning Resources
 

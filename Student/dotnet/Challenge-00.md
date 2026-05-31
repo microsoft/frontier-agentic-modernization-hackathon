@@ -1,6 +1,6 @@
-**[Home](../../README.md)** - [Next Challenge >](./Challenge-01.md)
+**[Home](../../README.md)** — [Next Challenge >](./Challenge-01.md)
 
-# Challenge 00 – Prerequisites: Ready, Set, GO! (.NET Track)
+# Challenge 00 — Prerequisites: Ready, Set, GO! (.NET Track)
 
 ## Introduction
 
@@ -66,11 +66,12 @@ docker info --format "Docker version: {{.ServerVersion}}" 2>/dev/null \
 
 To complete this challenge successfully, demonstrate:
 
-- `modernize --version` (CLI) or the GitHub Copilot Modernization extension shows as active in VS Code
-- `gh auth status` returns your authenticated GitHub account
-- `az account show` returns your Azure subscription
-- Running `git submodule status` in the repo root shows the .NET submodule at a valid commit hash (no leading `–`)
-- *(Optional)* The ContosoUniversity legacy app is accessible at its Azure VM URL
+1. `modernize --version` (CLI) or the GitHub Copilot Modernization extension shows as active in VS Code
+2. `gh auth status` returns your authenticated GitHub account
+3. `az account show` returns your Azure subscription
+4. Running `git submodule status` in the repo root shows the .NET submodule at a valid commit hash (no leading `–`)
+5. *(Optional)* The ContosoUniversity legacy app is accessible at its Azure VM URL
+6. **Explain to your coach** — what does the Dev Container provide, and why must both GitHub CLI *and* Azure CLI be authenticated before any `modernize` command can run?
 
 ## Learning Resources
 

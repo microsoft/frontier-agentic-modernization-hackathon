@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-02.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-04.md)
+[< Previous Challenge](./Challenge-02.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-04.md)
 
-# Challenge 03 – Containerize & Deploy the Java App to Azure Container Apps
+# Challenge 03 — Containerize & Deploy the Java App to Azure Container Apps
 
 ## Introduction
 
@@ -34,11 +34,12 @@ Containerize and deploy the modernized Java PhotoAlbum application to Azure:
 
 To complete this challenge successfully, demonstrate:
 
-- The container image builds successfully with `docker build`
-- `terraform apply` completes without errors
-- The Java PhotoAlbum app is accessible at its Azure Container Apps URL and photos can be uploaded and viewed
-- Azure Portal shows active connections from the Container App to Azure Database for PostgreSQL and Azure Blob Storage
-- No Oracle dependencies remain anywhere in the infrastructure
+1. The container image builds successfully with `docker build`
+2. `terraform apply` completes without errors
+3. The Java PhotoAlbum app is accessible at its Azure Container Apps URL and photos can be uploaded and viewed
+4. Azure Portal shows active connections from the Container App to Azure Database for PostgreSQL and Azure Blob Storage
+5. No Oracle dependencies remain anywhere in the infrastructure
+6. **Explain to your coach** — why must connection strings and credentials never be baked into the container image? How does your Terraform configuration handle secret injection at runtime?
 
 ## Learning Resources
 

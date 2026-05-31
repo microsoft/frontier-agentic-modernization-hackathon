@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-05.md) - **[Home](../../README.md)**
+[< Previous Challenge](./Challenge-05.md) — **[Home](../../README.md)**
 
-# Challenge 06 – Infuse AI into ContosoUniversity (Stretch)
+# Challenge 06 — Infuse AI into ContosoUniversity (Stretch)
 
 ## Introduction
 
@@ -52,12 +52,13 @@ Extend the ContosoUniversity .NET application end-to-end with an AI-assisted cou
 
 To complete this challenge, demonstrate:
 
-- `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a role assignment of `Cognitive Services OpenAI User` to the Container App's managed identity.
-- The Container App has the env vars `AzureOpenAI__Endpoint` and `AzureOpenAI__Deployment` (and **no** OpenAI key anywhere — `az containerapp show` should not reveal one).
-- Uploading a teaching-material image on **Create** or **Edit** triggers a successful chat-completion call (visible in Azure OpenAI metrics or App Insights dependency tracking).
-- The Review AI suggestions panel renders a description, a learning-objectives list, and an alt text. The admin can accept (the data is persisted) or regenerate.
-- The Course Details page renders the persisted `AltText` in the `<img alt>` attribute.
-- If the Azure OpenAI endpoint is temporarily unreachable, the upload still succeeds and the Course is saved without AI fields (graceful degradation).
+1. `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a role assignment of `Cognitive Services OpenAI User` to the Container App's managed identity.
+2. The Container App has the env vars `AzureOpenAI__Endpoint` and `AzureOpenAI__Deployment` (and **no** OpenAI key anywhere — `az containerapp show` should not reveal one).
+3. Uploading a teaching-material image on **Create** or **Edit** triggers a successful chat-completion call (visible in Azure OpenAI metrics or App Insights dependency tracking).
+4. The Review AI suggestions panel renders a description, a learning-objectives list, and an alt text. The admin can accept (the data is persisted) or regenerate.
+5. The Course Details page renders the persisted `AltText` in the `<img alt>` attribute.
+6. If the Azure OpenAI endpoint is temporarily unreachable, the upload still succeeds and the Course is saved without AI fields (graceful degradation).
+7. **Explain to your coach** — why must the AI service call be wrapped in `try/catch` and must never block the upload? What user-experience principle does this reflect?
 
 ## Learning Resources
 

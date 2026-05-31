@@ -1,3 +1,5 @@
+[< Previous Solution](./Solution-05.md) | **[Home](../../README.md)**
+
 # Coach Guide – Challenge 06: Infuse AI into PhotoAlbum (Java Track) — Stretch
 
 ## Purpose

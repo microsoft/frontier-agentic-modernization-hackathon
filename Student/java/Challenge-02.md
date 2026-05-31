@@ -1,6 +1,6 @@
-[< Previous Challenge](./Challenge-01.md) - **[Home](../../README.md)** - [Next Challenge >](./Challenge-03.md)
+[< Previous Challenge](./Challenge-01.md) — **[Home](../../README.md)** — [Next Challenge >](./Challenge-03.md)
 
-# Challenge 02 – Modernize the Java Application
+# Challenge 02 — Modernize the Java Application
 
 ## Introduction
 
@@ -41,11 +41,13 @@ Your approach should include:
 
 To complete this challenge successfully, demonstrate:
 
-- `mvn clean package` (or equivalent) succeeds with no compilation errors
-- The application starts locally against a PostgreSQL container (`docker-compose up`)
-- Photos can be uploaded and retrieved successfully in the running application
-- `modernize assess` on the updated codebase reports no remaining critical issues for the Java 8 → Java 21 / Spring Boot 2 → 3 migration
-- The `pom.xml` reflects Spring Boot 3.x and Java 21 as the compile target
+1. `mvn clean package` (or equivalent) succeeds with no compilation errors
+2. The application starts locally against a PostgreSQL container (`docker-compose up`)
+3. Photos can be uploaded and retrieved successfully in the running application
+4. `modernize assess` on the updated codebase reports no remaining critical issues for the Java 8 → Java 21 / Spring Boot 2 → 3 migration
+5. The `pom.xml` reflects Spring Boot 3.x and Java 21 as the compile target
+6. **Explain to your coach** — why is the `javax.*` → `jakarta.*` namespace change one of the most impactful breaking changes in the Spring Boot 2 → 3 migration?
+7. **Explain to your coach** — why is storing photos as BLOBs inside a relational database a cloud-native anti-pattern? What does Azure Blob Storage solve that the database approach cannot?
 
 ## Learning Resources
 
