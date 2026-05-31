@@ -33,10 +33,6 @@ Your approach should include:
 - Update the `Dockerfile` to build on a Java 21 base image
 - Update `application.properties` (or `application.yml`) with the new datasource configuration
 
-> **Hint:** The namespace change from `javax.persistence.*` to `jakarta.persistence.*` is one of the most common sources of compilation failures after a Spring Boot 2→3 migration.
-
-> **Hint:** When migrating from Oracle to PostgreSQL, pay attention to SQL dialect differences, especially around sequences, date/time types, and BLOB/CLOB handling.
-
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
@@ -57,3 +53,9 @@ To complete this challenge successfully, demonstrate:
 - [Spring Data JPA with PostgreSQL](https://spring.io/guides/gs/accessing-data-jpa/)
 - [Azure SDK for Java – Blob Storage](https://learn.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-java)
 - [Modernization CLI — plan commands](https://learn.microsoft.com/azure/developer/github-copilot-app-modernization/modernization-agent/cli-commands)
+
+## Tips
+
+- The namespace change from `javax.persistence.*` to `jakarta.persistence.*` is one of the most common sources of compilation failures after a Spring Boot 2→3 migration.
+- When migrating from Oracle to PostgreSQL, pay attention to SQL dialect differences, especially around sequences, date/time types, and BLOB/CLOB handling.
+

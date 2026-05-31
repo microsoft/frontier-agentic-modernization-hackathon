@@ -24,10 +24,6 @@ Apply production hardening to the modernized ContosoUniversity .NET application:
 - Configure the Container App to use a **User-Assigned Managed Identity** to access Key Vault — no connection strings in `appsettings.json` or Terraform variable files
 - Demonstrate that removing a secret from Key Vault causes the application to fail, and that restoring it restores the application
 
-> **Hint:** The Azure SDK for .NET supports `DefaultAzureCredential`, which transparently uses Managed Identity when running in Azure and developer credentials locally.
-
-> **Hint:** Azure Container Apps natively support Key Vault secret references — you can reference a Key Vault secret directly as a Container App secret without any SDK changes in the application.
-
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
@@ -45,3 +41,7 @@ To complete this challenge successfully, demonstrate:
 - [Azure Container Apps — use Key Vault secrets](https://learn.microsoft.com/azure/container-apps/manage-secrets)
 - [DefaultAzureCredential — .NET](https://learn.microsoft.com/dotnet/azure/sdk/authentication/credential-chains)
 
+## Tips
+
+- The Azure SDK for .NET supports `DefaultAzureCredential`, which transparently uses Managed Identity when running in Azure and developer credentials locally.
+- Azure Container Apps natively support Key Vault secret references — you can reference a Key Vault secret directly as a Container App secret without any SDK changes in the application.

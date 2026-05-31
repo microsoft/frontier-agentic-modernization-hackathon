@@ -14,7 +14,7 @@ In environments where Preview capabilities are enabled, the same extension can a
 
 This is a critical cutover step: application state moves to managed PostgreSQL so the Oracle container can be decommissioned before post-cutover hardening.
 
-A working reference for the Azure infrastructure already lives in `Coach/Resources/java/infra/aca/`. The `azurerm_postgresql_flexible_server` resource provisioned there is the migration target.
+A working reference for the Azure infrastructure already lives in `Coach/Solutions/java/infra/aca/`. The `azurerm_postgresql_flexible_server` resource provisioned there is the migration target.
 
 ---
 
@@ -72,7 +72,7 @@ Expected: `photos` has at least 2 rows.
 
 ### 2 — Primary path: Ora2Pg export + psql import
 
-1. Copy and adjust the template in `Coach/Resources/java/ora2pg.conf`.
+1. Copy and adjust the template in `Coach/Solutions/java/ora2pg.conf`.
 2. Export SQL:
 
 ```bash

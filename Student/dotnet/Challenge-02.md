@@ -38,12 +38,6 @@ Your approach should include:
 - Update `NotificationService.cs` to use the Azure Service Bus SDK (`Azure.Messaging.ServiceBus`)
 - Replace file upload code with the Azure Blob Storage SDK (`Azure.Storage.Blobs`)
 
-> **Hint:** After migrating to SDK-style `.csproj`, run `dotnet build` early and often to catch issues incrementally rather than all at once.
-
-> **Hint:** `Global.asax` startup logic must be migrated to `Program.cs` using the ASP.NET Core host builder pattern.
-
-> **Hint:** The `HtmlHelper` and `UrlHelper` extension methods work differently in ASP.NET Core Tag Helpers — Copilot Chat can help you convert Razor views.
-
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
@@ -65,3 +59,10 @@ To complete this challenge successfully, demonstrate:
 - [Azure Service Bus SDK for .NET](https://learn.microsoft.com/azure/service-bus-messaging/service-bus-dotnet-get-started-with-queues)
 - [Azure Blob Storage SDK for .NET](https://learn.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-dotnet)
 - [Modernization CLI — plan commands](https://learn.microsoft.com/azure/developer/github-copilot-app-modernization/modernization-agent/cli-commands)
+
+## Tips
+
+- After migrating to SDK-style `.csproj`, run `dotnet build` early and often to catch issues incrementally rather than all at once.
+- `Global.asax` startup logic must be migrated to `Program.cs` using the ASP.NET Core host builder pattern.
+- The `HtmlHelper` and `UrlHelper` extension methods work differently in ASP.NET Core Tag Helpers — Copilot Chat can help you convert Razor views.
+

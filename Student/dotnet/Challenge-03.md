@@ -25,12 +25,6 @@ Containerize and deploy the modernized ContosoUniversity .NET application to Azu
 - Verify that the deployed application is reachable via its Azure Container Apps URL
 - Confirm that all CRUD operations work and the Service Bus integration is active
 
-> **Hint:** Azure Container Apps can pull images directly from a registry. Make sure your Container App is configured with the correct registry credentials or uses Managed Identity for ACR access.
-
-> **Hint:** Use Terraform `output` values to retrieve the Container App URL after `terraform apply`.
-
-> **Hint:** Connection strings for Azure services should be passed to the Container App as **environment variables** or **secrets** — do not hard-code them in the container image.
-
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
@@ -50,3 +44,10 @@ To complete this challenge successfully, demonstrate:
 - [Azure SQL Database — Terraform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database)
 - [Azure Service Bus — Terraform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace)
 - [Dockerfile best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+
+## Tips
+
+- Azure Container Apps can pull images directly from a registry. Make sure your Container App is configured with the correct registry credentials or uses Managed Identity for ACR access.
+- Use Terraform `output` values to retrieve the Container App URL after `terraform apply`.
+- Connection strings for Azure services should be passed to the Container App as **environment variables** or **secrets** — do not hard-code them in the container image.
+

@@ -40,12 +40,6 @@ Extend the PhotoAlbum Java application end-to-end with vision-assisted metadata.
 - Update `src/main/resources/templates/detail.html`: add **Caption**, **Alt text**, and **Tags** rows in the info sidebar; bind `<img alt>` to `altText`.
 - Wire `azure.openai.endpoint` / `azure.openai.deployment` in `application.properties` (reading from env vars `AZURE_OPENAI_ENDPOINT` / `AZURE_OPENAI_DEPLOYMENT`).
 
-> **Hint:** The Java Azure OpenAI SDK takes the image as a `ChatMessageImageContentItem` constructed from a `ChatMessageImageUrl`. Build the URL string as `"data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(bytes)`. This works without making the image publicly addressable.
-
-> **Hint:** To get reliable JSON back, set `chatCompletionsOptions.setResponseFormat(new ChatCompletionsJsonResponseFormat())` and instruct the model in the system prompt to emit a JSON object matching your DTO. Mention the word "JSON" in the system prompt — the SDK and service both require it.
-
-> **Hint:** Wrap the AI call in `try/catch (Exception e)` and `logger.warn(...)`. If Azure OpenAI is throttled or unreachable, the upload must still succeed — the photo just gets saved without AI fields. Add a `POST /photo/{id}/reanalyze` endpoint as an optional backfill action.
-
 ## Success Criteria
 
 To complete this challenge, demonstrate:
@@ -67,3 +61,10 @@ To complete this challenge, demonstrate:
 - [`Cognitive Services OpenAI User` role](https://learn.microsoft.com/azure/ai-services/openai/how-to/role-based-access-control)
 - [`DefaultAzureCredential` — Java](https://learn.microsoft.com/azure/developer/java/sdk/identity-azure-hosted-auth)
 - [`azurerm_cognitive_account`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) and [`azurerm_cognitive_deployment`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_deployment) Terraform resources
+
+## Tips
+
+- The Java Azure OpenAI SDK takes the image as a `ChatMessageImageContentItem` constructed from a `ChatMessageImageUrl`. Build the URL string as `"data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(bytes)`. This works without making the image publicly addressable.
+- To get reliable JSON back, set `chatCompletionsOptions.setResponseFormat(new ChatCompletionsJsonResponseFormat())` and instruct the model in the system prompt to emit a JSON object matching your DTO. Mention the word "JSON" in the system prompt — the SDK and service both require it.
+- Wrap the AI call in `try/catch (Exception e)` and `logger.warn(...)`. If Azure OpenAI is throttled or unreachable, the upload must still succeed — the photo just gets saved without AI fields. Add a `POST /photo/{id}/reanalyze` endpoint as an optional backfill action.
+

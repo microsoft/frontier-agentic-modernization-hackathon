@@ -38,14 +38,6 @@ Perform a complete offline database migration from the legacy ContosoUniversity 
 - Confirm that no SQL admin passwords appear in `appsettings.json` or environment variables.
 - The application must connect to Azure SQL using `Authentication=Active Directory Default` (local dev) or `Authentication=Active Directory Managed Identity` (Container App) — not a username/password pair.
 
-> **Hint:** Run `terraform output` inside `Resources/dotnet/infra/aca/` to retrieve the Azure SQL Server FQDN and database name provisioned in Challenge 03.
-
-> **Hint:** LocalDB uses a named pipe transport rather than TCP/IP, which can prevent the DMS Integration Runtime from connecting directly. If the DMS migration agent cannot reach LocalDB, use the `sqlpackage` CLI as a fallback: export a `.bacpac` from LocalDB, then import it into Azure SQL Database.
-
-> **Hint:** If the target database already contains tables or rows (from a previous `Database.Migrate()` run), truncate the target tables before starting the DMS migration, or enable the "overwrite existing data" option in the wizard to avoid duplicate-key errors.
-
-> **Hint:** The `dbo.__EFMigrationsHistory` table tracks which EF Core migrations have been applied. Include it in the DMS table selection so the application does not try to re-run migrations on the already-populated database.
-
 ## Success Criteria
 
 To complete this challenge, demonstrate:
@@ -66,3 +58,11 @@ To complete this challenge, demonstrate:
 - [sqlpackage Import action (BACPAC)](https://learn.microsoft.com/sql/tools/sqlpackage/sqlpackage-import)
 - [Azure SQL Database authentication modes](https://learn.microsoft.com/azure/azure-sql/database/logins-create-manage)
 - [EF Core — applying migrations](https://learn.microsoft.com/ef/core/managing-schemas/migrations/applying)
+
+## Tips
+
+- Run `terraform output` inside `Resources/dotnet/infra/aca/` to retrieve the Azure SQL Server FQDN and database name provisioned in Challenge 03.
+- LocalDB uses a named pipe transport rather than TCP/IP, which can prevent the DMS Integration Runtime from connecting directly. If the DMS migration agent cannot reach LocalDB, use the `sqlpackage` CLI as a fallback: export a `.bacpac` from LocalDB, then import it into Azure SQL Database.
+- If the target database already contains tables or rows (from a previous `Database.Migrate()` run), truncate the target tables before starting the DMS migration, or enable the "overwrite existing data" option in the wizard to avoid duplicate-key errors.
+- The `dbo.__EFMigrationsHistory` table tracks which EF Core migrations have been applied. Include it in the DMS table selection so the application does not try to re-run migrations on the already-populated database.
+

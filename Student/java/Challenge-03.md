@@ -24,12 +24,6 @@ Containerize and deploy the modernized Java PhotoAlbum application to Azure:
 - Verify that the deployed application is reachable via its Azure Container Apps URL
 - Confirm that photos can be uploaded and retrieved against all Azure services
 
-> **Hint:** Azure Container Apps can pull images directly from a registry. Make sure your Container App is configured with the correct registry credentials or uses Managed Identity for ACR access.
-
-> **Hint:** Use Terraform `output` values to retrieve the Container App URL after `terraform apply`.
-
-> **Hint:** Connection strings for Azure services should be passed to the Container App as **environment variables** or **secrets** — do not hard-code them in the container image.
-
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
@@ -48,3 +42,10 @@ To complete this challenge successfully, demonstrate:
 - [Azure Container Registry — push and pull images](https://learn.microsoft.com/azure/container-registry/container-registry-get-started-docker-cli)
 - [Azure Database for PostgreSQL Flexible Server — Terraform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_flexible_server)
 - [Dockerfile best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+
+## Tips
+
+- Azure Container Apps can pull images directly from a registry. Make sure your Container App is configured with the correct registry credentials or uses Managed Identity for ACR access.
+- Use Terraform `output` values to retrieve the Container App URL after `terraform apply`.
+- Connection strings for Azure services should be passed to the Container App as **environment variables** or **secrets** — do not hard-code them in the container image.
+

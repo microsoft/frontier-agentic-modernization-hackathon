@@ -24,8 +24,6 @@ Review the generated assessment report and discuss as a team:
 - What is the recommended migration target (runtime version, framework version)?
 - Are there any breaking changes the tool cannot automatically fix?
 
-> **Hint:** You can run the assessment from the terminal with `modernize assess` inside the application folder, or use the VS Code extension's "Assess" panel. Both produce the same report.
-
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
@@ -39,3 +37,8 @@ To complete this challenge successfully, demonstrate:
 
 - [Modernization assessment overview](https://learn.microsoft.com/en-us/azure/developer/github-copilot-app-modernization/modernization-agent/overview)
 - [Spring Boot 3 migration guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide)
+
+## Tips
+
+- You can run the assessment from the terminal with `modernize assess` inside the application folder, or use the VS Code extension's "Assess" panel. Both produce the same report.
+

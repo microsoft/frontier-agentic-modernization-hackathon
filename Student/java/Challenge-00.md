@@ -29,8 +29,6 @@ This is recommended — it gives your squad a concrete "before" picture and vali
 - Follow the steps in [`../Resources/java/infra/vm/README.md`](../Resources/java/infra/vm/README.md)
 - Runs at `http://<vm-ip>:8080` after ~10 minutes
 
-> **Tip:** Your squad can deploy the VM while other setup steps are running.
-
 ## Pre-flight Validation Checklist
 
 Run these commands from the repo root before starting Challenge 01. Every check must pass:
@@ -62,12 +60,6 @@ docker info --format "Docker version: {{.ServerVersion}}" 2>/dev/null \
   || echo "⚠ Docker is not running — start Docker Desktop"
 ```
 
-> **If `git submodule status` shows a `-` prefix**, the submodule has not been initialised.
-> Fix it with: `git submodule update --init --recursive`
-
-> **If `modernize` is not found**, ensure `~/.local/bin` is on your PATH:
-> `export PATH="$HOME/.local/bin:$PATH"` (add to `~/.bashrc` or `~/.zshrc` to persist)
-
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
@@ -86,3 +78,9 @@ To complete this challenge successfully, demonstrate:
 - [Git submodules documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 - [Dev Containers overview](https://code.visualstudio.com/docs/devcontainers/containers)
 - [Terraform getting started](https://developer.hashicorp.com/terraform/tutorials/azure-get-started)
+
+## Tips
+
+- Your squad can deploy the VM while other setup steps are running.
+- **If `git submodule status` shows a `-` prefix**, the submodule has not been initialised. Fix it with: `git submodule update --init --recursive`
+- **If `modernize` is not found**, ensure `~/.local/bin` is on your PATH: `export PATH="$HOME/.local/bin:$PATH"` (add to `~/.bashrc` or `~/.zshrc` to persist)

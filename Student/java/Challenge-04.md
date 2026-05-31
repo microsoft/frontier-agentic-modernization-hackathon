@@ -33,7 +33,7 @@ Verify installation: `ora2pg --version`
 
 **Export the Oracle schema and data using Ora2Pg**
 
-Create an `ora2pg.conf` configuration file. Use the reference template from [Coach Resources](../../Coach/Resources/java/ora2pg.conf):
+Create an `ora2pg.conf` configuration file. Use the reference template from [Coach Resources](../../Coach/Solutions/java/ora2pg.conf):
 
 ```ini
 [ora2pg]
@@ -113,20 +113,6 @@ If your environment has Preview migration features enabled, you can also run:
   ```
 - This is the definitive proof that the migration succeeded and the legacy system is no longer needed.
 
-> **Hint:** Run `terraform output db_fqdn` inside `Resources/java/infra/aca/` to retrieve the PostgreSQL Flexible Server hostname provisioned in Challenge 03.
-
-> **Hint:** If you encounter `psql: error: FATAL: SSL connection error`, or similar SSL issues, add `-sslmode=disable` to your `psql` command: `psql -h <db-fqdn> ... -sslmode=disable < photoalbum.sql` or disable SSL in Azure Portal (Connection Security).
-
-> **Hint:** If Ora2Pg cannot connect to Oracle, ensure:
->   - The Oracle container is running: `docker ps | grep oracle-db`
->   - Oracle is listening on port 1521: `netstat -an | grep 1521` or `ss -an | grep 1521`
->   - The TNS connection string is correct: `ORACLE_DSN=dbi:Oracle:host=localhost;sid=FREEPDB1`
->   - Oracle `photoalbum` user credentials are correct (default password often same as username)
-
-> **Hint:** Set `spring.jpa.hibernate.ddl-auto=validate` (or pass the env var `SPRING_JPA_HIBERNATE_DDL_AUTO=validate`) **before** pointing the application at the populated PostgreSQL database. With `create`, Hibernate will silently destroy all migrated data on the first application start.
-
-> **Hint:** Ora2Pg automatically converts Oracle `BLOB` to PostgreSQL `BYTEA`. The entity definition does not need to change; Hibernate handles both transparently.
-
 ## Success Criteria
 
 To complete this challenge, demonstrate:
@@ -155,3 +141,12 @@ To complete this challenge, demonstrate:
 - [Self-hosted Integration Runtime installation](https://learn.microsoft.com/azure/data-factory/create-self-hosted-integration-runtime)
 - [`psql` — PostgreSQL interactive terminal](https://www.postgresql.org/docs/current/app-psql.html)
 - [Hibernate `ddl-auto` reference](https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)
+
+## Tips
+
+- Run `terraform output db_fqdn` inside `Resources/java/infra/aca/` to retrieve the PostgreSQL Flexible Server hostname provisioned in Challenge 03.
+- If you encounter `psql: error: FATAL: SSL connection error`, or similar SSL issues, add `-sslmode=disable` to your `psql` command: `psql -h <db-fqdn> ... -sslmode=disable < photoalbum.sql` or disable SSL in Azure Portal (Connection Security).
+- If Ora2Pg cannot connect to Oracle, ensure the Oracle container is running (`docker ps | grep oracle-db`), Oracle is listening on port 1521, the TNS connection string is correct (`ORACLE_DSN=dbi:Oracle:host=localhost;sid=FREEPDB1`), and the `photoalbum` user credentials are correct.
+- Set `spring.jpa.hibernate.ddl-auto=validate` (or env var `SPRING_JPA_HIBERNATE_DDL_AUTO=validate`) **before** pointing the application at the populated PostgreSQL database. With `create`, Hibernate will silently destroy all migrated data on the first application start.
+- Ora2Pg automatically converts Oracle `BLOB` to PostgreSQL `BYTEA`. The entity definition does not need to change; Hibernate handles both transparently.
+

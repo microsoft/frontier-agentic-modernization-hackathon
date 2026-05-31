@@ -118,7 +118,7 @@ hackathon/
     ├── README.md            ← Coach guide and event logistics
     ├── dotnet/              ← Coach notes for the .NET track
     ├── java/                ← Coach notes for the Java track
-    └── Resources/           ← Reference implementations the coaches run
+    └── Solutions/           ← Reference implementations the coaches run
 ```
 
 The sample applications live under each track:

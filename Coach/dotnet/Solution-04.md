@@ -6,7 +6,7 @@
 
 This challenge takes the squad through a **production-grade data migration** from an on-premises SQL Server (LocalDB / SQL Express) to the Azure SQL Database that was provisioned in Challenge 03. Students use **Azure Database Migration Service (DMS)** — operated directly from the Azure Portal — to assess compatibility, migrate the schema, copy data, and perform cutover validation. This is a critical cutover step: the modernized application data moves into a managed, geo-redundant cloud database before post-cutover hardening.
 
-A working reference for the Azure infrastructure already lives in `Coach/Resources/dotnet/infra/aca/`. The Azure SQL Database resource (`azurerm_mssql_database.contoso`) provisioned there is the migration target.
+A working reference for the Azure infrastructure already lives in `Coach/Solutions/dotnet/infra/aca/`. The Azure SQL Database resource (`azurerm_mssql_database.contoso`) provisioned there is the migration target.
 
 ---
 

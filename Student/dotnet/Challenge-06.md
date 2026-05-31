@@ -42,12 +42,6 @@ Extend the ContosoUniversity .NET application end-to-end with an AI-assisted cou
 - Update `Views/Courses/Create.cshtml` and `Edit.cshtml` to render a **"Review AI suggestions"** panel above the submit button when `TempData["AiSuggestion"]` is present (suggested description, bullet list of learning objectives, suggested alt text, an "Accept" button, and a "Regenerate" link that POSTs to a new action).
 - Update `Views/Courses/Details.cshtml` so the `<img alt="...">` attribute uses `Model.AltText` when present.
 
-> **Hint:** The Azure OpenAI vision API expects the image as a content part of type `image_url`. When the image is in Blob Storage, fetch the bytes via `BlobClient.DownloadContentAsync()` and pass them as a base64 `data:` URI — this works whether the blob is public or private.
-
-> **Hint:** Use `ChatResponseFormat.CreateJsonObjectFormat()` and instruct the model in the system prompt to reply with a JSON object matching your DTO. Without this, parsing will break the first time the model adds prose around the JSON.
-
-> **Hint:** Wrap the entire AI call in `try/catch` and `ILogger.LogWarning(...)` on failure. The user must always be able to save the course — even if Azure OpenAI is throttled, the deployment is wrong, or the role assignment has not yet propagated.
-
 ## Success Criteria
 
 To complete this challenge, demonstrate:
@@ -69,3 +63,10 @@ To complete this challenge, demonstrate:
 - [`Cognitive Services OpenAI User` role](https://learn.microsoft.com/azure/ai-services/openai/how-to/role-based-access-control)
 - [`DefaultAzureCredential` — .NET](https://learn.microsoft.com/dotnet/azure/sdk/authentication/credential-chains)
 - [`azurerm_cognitive_account`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) and [`azurerm_cognitive_deployment`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_deployment) Terraform resources
+
+## Tips
+
+- The Azure OpenAI vision API expects the image as a content part of type `image_url`. When the image is in Blob Storage, fetch the bytes via `BlobClient.DownloadContentAsync()` and pass them as a base64 `data:` URI — this works whether the blob is public or private.
+- Use `ChatResponseFormat.CreateJsonObjectFormat()` and instruct the model in the system prompt to reply with a JSON object matching your DTO. Without this, parsing will break the first time the model adds prose around the JSON.
+- Wrap the entire AI call in `try/catch` and `ILogger.LogWarning(...)` on failure. The user must always be able to save the course — even if Azure OpenAI is throttled, the deployment is wrong, or the role assignment has not yet propagated.
+
