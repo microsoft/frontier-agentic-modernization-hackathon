@@ -13,7 +13,7 @@ variable "location" {
 variable "app_image" {
   type        = string
   description = "Container image to deploy in the Container App (e.g. ghcr.io/org/contoso-university:latest)."
-  default     = "ghcr.io/cmendible/github-copilot-modernization/contoso-university:latest"
+  default     = "ghcr.io/microsoft/frontier-agentic-modernization-hackathon/contoso-university:latest"
 }
 
 variable "github_username" {
