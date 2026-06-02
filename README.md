@@ -130,4 +130,8 @@ Student/Resources/java/PhotoAlbum-Java/                                        â
 
 ## Contributors
 
-- Carlos Mendible ([@cmendible](https://github.com/cmendible))
+Thanks to everyone who has contributed!
+
+<a href="https://github.com/microsoft/frontier-agentic-modernization-hackathon/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=microsoft/frontier-agentic-modernization-hackathon" />
+</a>
