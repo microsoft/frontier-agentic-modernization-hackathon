@@ -6,8 +6,10 @@ on:
     paths:
       - './index.html'
       - './README.md'
+      - './Student/customer/Challenge-*.md'
       - './Student/java/Challenge-*.md'
       - './Student/dotnet/Challenge-*.md'
+      - './Coach/customer/Solution-*.md'
       - './Coach/java/Solution-*.md'
       - './Coach/dotnet/Solution-*.md'
 
