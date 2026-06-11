@@ -45,6 +45,25 @@ Each challenge has a dedicated per-track guide. Pick **`dotnet/`**, **`java/`**,
 - Challenge 06: **Infuse AI into the Application (Stretch)** — [.NET](Student/dotnet/Challenge-06.md) · [Java](Student/java/Challenge-06.md)
   - Add Azure OpenAI (vision, `gpt-4.1-mini`) with Managed Identity so the app generates course/photo metadata on upload.
 
+### eShopOnWeb Track (.NET 8 → .NET 10)
+
+**eShopOnWeb** is an ASP.NET Core 8.0 multi-project reference application (Web MVC + PublicApi + BlazorAdmin + Infrastructure + ApplicationCore). The migration targets .NET 10 and introduces real breaking changes: the Swashbuckle → `Microsoft.AspNetCore.OpenApi` transition, Central Package Management cascade, EF Core 10 updates, and Blazor WASM package bumps — plus cloud-native uplift with Azure Service Bus and Azure Blob Storage.
+
+- Challenge 00: **Prerequisites — Ready, Set, GO!** — [.NET 8](Student/net8/Challenge-00.md)
+  - Prepare your workstation with the .NET 10 SDK and verify access to all required tools and services.
+- Challenge 01: **Assess the eShopOnWeb Application** — [.NET 8](Student/net8/Challenge-01.md)
+  - Run the GitHub Copilot Modernization assessment and identify the top migration blockers (including Swashbuckle).
+- Challenge 02: **Modernize to .NET 10** — [.NET 8](Student/net8/Challenge-02.md)
+  - Bump the TFM across all 5 projects, update `Directory.Packages.props`, replace Swashbuckle with `Microsoft.AspNetCore.OpenApi`, and fix all breaking changes.
+- Challenge 03: **Containerize, Cloud-Modernize & Deploy** — [.NET 8](Student/net8/Challenge-03.md)
+  - Add Azure Service Bus (order events) and Azure Blob Storage (product images), update Dockerfiles to .NET 10, and deploy to Azure Container Apps via Terraform.
+- Challenge 04: **Migrate the Database to Azure SQL** — [.NET 8](Student/net8/Challenge-04.md)
+  - Apply EF Core migrations for both `CatalogContext` and `AppIdentityDbContext` against Azure SQL and validate end-to-end.
+- Challenge 05: **Observe & Secure** — [.NET 8](Student/net8/Challenge-05.md)
+  - Integrate Application Insights, secure all secrets with Azure Key Vault and Managed Identity.
+- Challenge 06: **Infuse AI into the Application (Stretch)** — [.NET 8](Student/net8/Challenge-06.md)
+  - Add Azure OpenAI (`gpt-4.1-mini`, vision) with Managed Identity to generate product descriptions and alt text on image upload.
+
 ### Your App Track
 
 - Challenge 00: **Modernize a Customer Application** — [Customer](Student/customer/Challenge-00.md)
@@ -149,14 +168,16 @@ modernize   # launch interactive TUI
 ├── README.md                ← This file (hack one-pager)
 ├── index.html               ← Card-based navigation for the hack
 ├── Student/
-│   ├── dotnet/              ← Challenge-00..06 for the .NET track
+│   ├── dotnet/              ← Challenge-00..06 for the .NET Framework 4.8 track
 │   ├── java/                ← Challenge-00..06 for the Java track
+│   ├── net8/                ← Challenge-00..06 for the .NET 8 → .NET 10 track
 │   ├── customer/            ← Challenge-00 for the Your App track
 │   └── Resources/           ← Sample apps + helper scripts per track
 └── Coach/
     ├── README.md            ← Coach guide and event logistics
-    ├── dotnet/              ← Coach notes for the .NET track
+    ├── dotnet/              ← Coach notes for the .NET Framework 4.8 track
     ├── java/                ← Coach notes for the Java track
+    ├── net8/                ← Coach notes for the .NET 8 → .NET 10 track
     ├── customer/            ← Coach notes for the Your App track
     └── Solutions/           ← Reference implementations the coaches run
 ```
@@ -164,8 +185,9 @@ modernize   # launch interactive TUI
 The sample applications live under each track:
 
 ```
-Student/Resources/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/   ← .NET app
+Student/Resources/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/   ← .NET Framework 4.8 app
 Student/Resources/java/PhotoAlbum-Java/                                        ← Java app
+Student/Resources/net8/eShopOnWeb/                                             ← ASP.NET Core 8.0 app
 ```
 
 ## Contributors

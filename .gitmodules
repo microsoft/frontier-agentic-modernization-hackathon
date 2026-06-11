@@ -4,3 +4,7 @@
 [submodule "Student/Resources/java/PhotoAlbum-Java"]
 	path = Student/Resources/java/PhotoAlbum-Java
 	url = https://github.com/Azure-Samples/PhotoAlbum-Java.git
+[submodule "Student/Resources/net8/eShopOnWeb"]
+	path = Student/Resources/net8/eShopOnWeb
+	url = https://github.com/NimblePros/eShopOnWeb.git
+	branch = dotnet8

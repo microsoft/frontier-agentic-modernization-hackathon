@@ -1466,6 +1466,7 @@
             <li><a href="#stack">Services</a></li>
             <li><a href="#java-challenges">Java Challenge</a></li>
             <li><a href="#dotnet-challenges">.NET Challenge</a></li>
+            <li><a href="#net8-challenges">.NET 8 Challenge</a></li>
             <li><a href="#customer-challenges">Your App</a></li>
         </ul>
         <a class="nav-cta" href="https://github.com/microsoft/frontier-agentic-modernization-hackathon" target="_blank"
@@ -1523,6 +1524,11 @@
                     <span class="arrow">→</span>
                     <span class="to">to Azure</span>
                 </div>
+                <div class="transform-pill">
+                    <span class="from">ASP.NET Core 8.0</span>
+                    <span class="arrow">→</span>
+                    <span class="to">.NET 10 + Azure Services</span>
+                </div>
             </div>
             <div class="hero-actions">
                 <a class="btn-primary" href="#challenges">
@@ -1550,15 +1556,15 @@
             <div class="stat-label">Day Estimated</div>
         </div>
         <div class="stat-item reveal">
-            <div class="stat-value display">1<span>5</span></div>
+            <div class="stat-value display">2<span>2</span></div>
             <div class="stat-label">Challenges</div>
         </div>
         <div class="stat-item reveal" style="transition-delay:.2s">
-            <div class="stat-value display">0<span>3</span></div>
-            <div class="stat-label">Parallel Tracks</div>
+            <div class="stat-value display">0<span>4</span></div>
+            <div class="stat-label">Tracks</div>
         </div>
         <div class="stat-item reveal" style="transition-delay:.1s">
-            <div class="stat-value display">0<span>2</span></div>
+            <div class="stat-value display">0<span>3</span></div>
             <div class="stat-label">Demo Applications</div>
         </div>
         <div class="stat-item reveal" style="transition-delay:.1s">
@@ -2284,6 +2290,194 @@
             </div>
         </div>
 
+        <!-- .NET 8 → .NET 10 Track -->
+        <div id="net8-challenges" style="margin-top:2rem;">
+            <div class="track-label" style="color:#00e676;">🟢 .NET 8 Track (eShopOnWeb)</div>
+            <div class="challenges-grid">
+
+                <!-- net8 CH-00 -->
+                <a class="challenge-card full" data-phase="00" href="Student/net8/Challenge-00.md">
+                    <div class="card-bg-number display">00</div>
+                    <div class="card-inner">
+                        <div>
+                            <div class="card-top">
+                                <span class="card-phase-badge"
+                                    style="color:#00e676;border-color:#00e676;background:rgba(0,230,118,.12);">Setup</span>
+                                <span class="card-num mono">CH — 00</span>
+                            </div>
+                            <h3 class="card-title display">Prerequisites<br>(.NET 8)</h3>
+                        </div>
+                        <div style="display:flex;flex-direction:column;justify-content:space-between;">
+                            <p class="card-desc">
+                                Configure your workstation for the .NET 8 track: install the .NET 10 SDK, verify
+                                GitHub Copilot Modernization CLI, Docker, Azure CLI, and Terraform. Initialise the
+                                eShopOnWeb submodule.
+                            </p>
+                            <div class="card-footer">
+                                <div class="card-tags">
+                                    <span class="card-tag">.NET 10 SDK</span>
+                                    <span class="card-tag">modernize CLI</span>
+                                    <span class="card-tag">Docker</span>
+                                    <span class="card-tag">Terraform</span>
+                                </div>
+                                <div class="card-arrow mono">Open challenge <span>→</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- net8 CH-01 -->
+                <a class="challenge-card" data-phase="01" href="Student/net8/Challenge-01.md">
+                    <div class="card-bg-number display">01</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge"
+                            style="color:#00e676;border-color:#00e676;background:rgba(0,230,118,.12);">Assess</span>
+                        <span class="card-num mono">CH — 01</span>
+                    </div>
+                    <h3 class="card-title display">Assess eShopOnWeb</h3>
+                    <p class="card-desc">
+                        Run <code class="mono" style="font-size:.85em">modernize assess</code> on eShopOnWeb.
+                        Identify Swashbuckle removal, TFM blockers, and EF Core 10 changes across all 5 projects.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">modernize assess</span>
+                            <span class="card-tag">Swashbuckle</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- net8 CH-02 -->
+                <a class="challenge-card" data-phase="02" href="Student/net8/Challenge-02.md">
+                    <div class="card-bg-number display">02</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge"
+                            style="color:#00e676;border-color:#00e676;background:rgba(0,230,118,.12);">Modernize</span>
+                        <span class="card-num mono">CH — 02</span>
+                    </div>
+                    <h3 class="card-title display">Modernize to .NET 10</h3>
+                    <p class="card-desc">
+                        Bump all 5 projects to <code class="mono" style="font-size:.85em">net10.0</code> via
+                        <code class="mono" style="font-size:.85em">Directory.Packages.props</code>. Replace Swashbuckle
+                        with <code class="mono" style="font-size:.85em">Microsoft.AspNetCore.OpenApi</code> + Scalar.
+                        Fix EF Core 10 and Blazor WASM breaking changes.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">.NET 10</span>
+                            <span class="card-tag">OpenAPI</span>
+                            <span class="card-tag">Blazor WASM</span>
+                            <span class="card-tag">EF Core 10</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- net8 CH-03 -->
+                <a class="challenge-card half" data-phase="03" href="Student/net8/Challenge-03.md">
+                    <div class="card-bg-number display">03</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge"
+                            style="color:#00e676;border-color:#00e676;background:rgba(0,230,118,.12);">Deploy</span>
+                        <span class="card-num mono">CH — 03</span>
+                    </div>
+                    <h3 class="card-title display">Containerize &amp; Deploy (eShopOnWeb)</h3>
+                    <p class="card-desc">
+                        Add Azure Service Bus (order events) and Azure Blob Storage (product images).
+                        Update Dockerfiles to .NET 10 base images. Deploy Web + PublicApi to Azure Container Apps via
+                        Terraform.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">Docker</span>
+                            <span class="card-tag">ACA</span>
+                            <span class="card-tag">Service Bus</span>
+                            <span class="card-tag">Blob Storage</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- net8 CH-04 -->
+                <a class="challenge-card half" data-phase="04" href="Student/net8/Challenge-04.md">
+                    <div class="card-bg-number display">04</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge"
+                            style="color:#00e676;border-color:#00e676;background:rgba(0,230,118,.12);">Data
+                            Migration</span>
+                        <span class="card-num mono">CH — 04</span>
+                    </div>
+                    <h3 class="card-title display">Migrate the Database to Azure SQL</h3>
+                    <p class="card-desc">
+                        Apply EF Core migrations for both <code class="mono"
+                            style="font-size:.85em">CatalogContext</code>
+                        and <code class="mono" style="font-size:.85em">AppIdentityDbContext</code> against Azure SQL.
+                        Validate seed data and end-to-end order flow.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">EF Core</span>
+                            <span class="card-tag">Azure SQL</span>
+                            <span class="card-tag">Seeding</span>
+                            <span class="card-tag">Validation</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- net8 CH-05 -->
+                <a class="challenge-card half" data-phase="05" href="Student/net8/Challenge-05.md">
+                    <div class="card-bg-number display">05</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge"
+                            style="color:#00e676;border-color:#00e676;background:rgba(0,230,118,.12);">Observe &amp;
+                            Secure</span>
+                        <span class="card-num mono">CH — 05</span>
+                    </div>
+                    <h3 class="card-title display">Observe &amp; Secure</h3>
+                    <p class="card-desc">
+                        Application Insights distributed tracing across Web + PublicApi.
+                        Azure Key Vault + Managed Identity — zero plaintext secrets.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">App Insights</span>
+                            <span class="card-tag">Key Vault</span>
+                            <span class="card-tag">Managed Identity</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- net8 CH-06 -->
+                <a class="challenge-card half" data-phase="06" href="Student/net8/Challenge-06.md">
+                    <div class="card-bg-number display">06</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge"
+                            style="color:#00e676;border-color:#00e676;background:rgba(0,230,118,.12);">Stretch ·
+                            AI</span>
+                        <span class="card-num mono">CH — 06</span>
+                    </div>
+                    <h3 class="card-title display">Infuse AI into eShopOnWeb</h3>
+                    <p class="card-desc">
+                        Call Azure OpenAI <code class="mono" style="font-size:.85em">gpt-4.1-mini</code> (vision)
+                        from the catalog admin to auto-generate product descriptions, tags, and accessible alt text
+                        using Managed Identity.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">Azure OpenAI</span>
+                            <span class="card-tag">Vision</span>
+                            <span class="card-tag">Managed Identity</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
         <!-- Customer Track -->
         <div id="customer-challenges" style="margin-top:2rem;">
             <div class="track-label" style="color:var(--amber);">🏢 Your App Track</div>
@@ -2707,9 +2901,178 @@
             </div>
         </div>
 
-    </section>
+        <!-- Coach .NET 8 Track -->
+        <div style="margin-bottom:2rem;">
+            <div class="track-label" style="color:#00e676;">🟢 .NET 8 Track — Coach Notes</div>
+            <div class="challenges-grid">
 
-    <!-- Footer -->
+                <!-- Coach net8 CH-00 -->
+                <a class="challenge-card full" data-phase="00" href="Coach/net8/Solution-00.md">
+                    <div class="card-bg-number display">00</div>
+                    <div class="card-inner">
+                        <div>
+                            <div class="card-top">
+                                <span class="card-phase-badge">Setup</span>
+                                <span class="card-num mono">COACH — 00</span>
+                            </div>
+                            <h3 class="card-title display">Prerequisites<br>Coach Notes</h3>
+                        </div>
+                        <div style="display:flex;flex-direction:column;justify-content:space-between;">
+                            <p class="card-desc">
+                                Expected environment state, .NET 10 SDK check, submodule pin details
+                                (<code class="mono" style="font-size:.85em">NimblePros/eShopOnWeb @ a34eda5</code>),
+                                and the <code class="mono" style="font-size:.85em">global.json</code> vs
+                                <code class="mono" style="font-size:.85em">Directory.Packages.props</code> discussion
+                                point.
+                            </p>
+                            <div class="card-footer">
+                                <div class="card-tags">
+                                    <span class="card-tag">facilitation</span>
+                                    <span class="card-tag">setup tips</span>
+                                </div>
+                                <div class="card-arrow mono">Open guide <span>→</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Coach net8 CH-01 -->
+                <a class="challenge-card" data-phase="01" href="Coach/net8/Solution-01.md">
+                    <div class="card-bg-number display">01</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Assess</span>
+                        <span class="card-num mono">COACH — 01</span>
+                    </div>
+                    <h3 class="card-title display">Assess — Coach Notes</h3>
+                    <p class="card-desc">
+                        Expected top findings: Swashbuckle critical, TFM bump, package cascade.
+                        Mini-lecture on Central Package Management risks. Debrief discussion questions.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">expected output</span>
+                            <span class="card-tag">debrief</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Coach net8 CH-02 -->
+                <a class="challenge-card" data-phase="02" href="Coach/net8/Solution-02.md">
+                    <div class="card-bg-number display">02</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Modernize</span>
+                        <span class="card-num mono">COACH — 02</span>
+                    </div>
+                    <h3 class="card-title display">Modernize — Coach Notes</h3>
+                    <p class="card-desc">
+                        Suggested modernize plan goal, exact <code class="mono"
+                            style="font-size:.85em">Directory.Packages.props</code>
+                        version table, Swashbuckle → OpenAPI + Scalar replacement snippet, common pitfalls table.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">pitfalls</span>
+                            <span class="card-tag">solutions</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Coach net8 CH-03 -->
+                <a class="challenge-card half" data-phase="03" href="Coach/net8/Solution-03.md">
+                    <div class="card-bg-number display">03</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Deploy</span>
+                        <span class="card-num mono">COACH — 03</span>
+                    </div>
+                    <h3 class="card-title display">Deploy — Coach Notes</h3>
+                    <p class="card-desc">
+                        Dockerfile pitfalls (build context), Service Bus singleton pattern, Blob SAS URL patterns,
+                        Terraform checklist for ACA + SQL + Storage + Service Bus.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">terraform</span>
+                            <span class="card-tag">Service Bus</span>
+                            <span class="card-tag">checklist</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Coach net8 CH-04 -->
+                <a class="challenge-card half" data-phase="04" href="Coach/net8/Solution-04.md">
+                    <div class="card-bg-number display">04</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Data Migration</span>
+                        <span class="card-num mono">COACH — 04</span>
+                    </div>
+                    <h3 class="card-title display">Migrate the Database — Coach Notes</h3>
+                    <p class="card-desc">
+                        Reference <code class="mono" style="font-size:.85em">dotnet ef database update</code> commands
+                        for both DbContexts, expected seed row counts, Azure SQL firewall pitfalls.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">EF Core</span>
+                            <span class="card-tag">Azure SQL</span>
+                            <span class="card-tag">pitfalls</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Coach net8 CH-05 -->
+                <a class="challenge-card half" data-phase="05" href="Coach/net8/Solution-05.md">
+                    <div class="card-bg-number display">05</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Observe &amp; Secure</span>
+                        <span class="card-num mono">COACH — 05</span>
+                    </div>
+                    <h3 class="card-title display">Observe &amp; Secure — Coach Notes</h3>
+                    <p class="card-desc">
+                        Application Insights setup, Key Vault + Managed Identity Terraform snippets,
+                        <code class="mono" style="font-size:.85em">DefaultAzureCredential</code> chain explanation,
+                        role propagation wait times.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">observability</span>
+                            <span class="card-tag">security</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+                <!-- Coach net8 CH-06 -->
+                <a class="challenge-card half" data-phase="06" href="Coach/net8/Solution-06.md">
+                    <div class="card-bg-number display">06</div>
+                    <div class="card-top">
+                        <span class="card-phase-badge">Stretch · AI</span>
+                        <span class="card-num mono">COACH — 06</span>
+                    </div>
+                    <h3 class="card-title display">Infuse AI — Coach Notes</h3>
+                    <p class="card-desc">
+                        Reference Terraform for Azure OpenAI + RBAC, <code class="mono"
+                            style="font-size:.85em">CatalogItemAiService</code>
+                        implementation with graceful degradation, common pitfalls, and Blazor Web App migration stretch
+                        note.
+                    </p>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            <span class="card-tag">Azure OpenAI</span>
+                            <span class="card-tag">reference impl</span>
+                            <span class="card-tag">pitfalls</span>
+                        </div>
+                        <div class="card-arrow mono">Open <span>→</span></div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+    </section>
     <footer>
         <div class="footer-copy mono">// GitHub Copilot App Modernization · 2026</div>
     </footer>
@@ -2859,6 +3222,13 @@
             { label: 'NET-04', file: 'Student/dotnet/Challenge-04.md', title: '.NET – Migrate Data' },
             { label: 'NET-05', file: 'Student/dotnet/Challenge-05.md', title: '.NET – Observe & Secure' },
             { label: 'NET-06', file: 'Student/dotnet/Challenge-06.md', title: '.NET – AI Assist' },
+            { label: 'NET8-00', file: 'Student/net8/Challenge-00.md', title: '.NET 8 – Prerequisites' },
+            { label: 'NET8-01', file: 'Student/net8/Challenge-01.md', title: '.NET 8 – Assess' },
+            { label: 'NET8-02', file: 'Student/net8/Challenge-02.md', title: '.NET 8 – Modernize' },
+            { label: 'NET8-03', file: 'Student/net8/Challenge-03.md', title: '.NET 8 – Deploy' },
+            { label: 'NET8-04', file: 'Student/net8/Challenge-04.md', title: '.NET 8 – Migrate Data' },
+            { label: 'NET8-05', file: 'Student/net8/Challenge-05.md', title: '.NET 8 – Observe & Secure' },
+            { label: 'NET8-06', file: 'Student/net8/Challenge-06.md', title: '.NET 8 – AI Assist' },
             { label: 'CUSTOMER-00', file: 'Student/customer/Challenge-00.md', title: 'Customer – Modernize Your App' },
         ];
 
@@ -2877,6 +3247,13 @@
             { label: 'COACH-NET-04', file: 'Coach/dotnet/Solution-04.md', title: 'Coach · .NET – Migrate Data' },
             { label: 'COACH-NET-05', file: 'Coach/dotnet/Solution-05.md', title: 'Coach · .NET – Observe & Secure' },
             { label: 'COACH-NET-06', file: 'Coach/dotnet/Solution-06.md', title: 'Coach · .NET – AI Assist' },
+            { label: 'COACH-NET8-00', file: 'Coach/net8/Solution-00.md', title: 'Coach · .NET 8 – Prerequisites' },
+            { label: 'COACH-NET8-01', file: 'Coach/net8/Solution-01.md', title: 'Coach · .NET 8 – Assess' },
+            { label: 'COACH-NET8-02', file: 'Coach/net8/Solution-02.md', title: 'Coach · .NET 8 – Modernize' },
+            { label: 'COACH-NET8-03', file: 'Coach/net8/Solution-03.md', title: 'Coach · .NET 8 – Deploy' },
+            { label: 'COACH-NET8-04', file: 'Coach/net8/Solution-04.md', title: 'Coach · .NET 8 – Migrate Data' },
+            { label: 'COACH-NET8-05', file: 'Coach/net8/Solution-05.md', title: 'Coach · .NET 8 – Observe & Secure' },
+            { label: 'COACH-NET8-06', file: 'Coach/net8/Solution-06.md', title: 'Coach · .NET 8 – AI Assist' },
             { label: 'COACH-CUSTOMER-00', file: 'Coach/customer/Solution-00.md', title: 'Coach · Customer – Modernize Your App' },
         ];
 
