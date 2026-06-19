@@ -4,6 +4,4 @@
 prefix                = "wth"
 location              = "swedencentral"
 app_image             = "ghcr.io/microsoft/frontier-agentic-modernization-hackathon/contoso-university:latest"
-github_username       = "your-github-username"
-github_token          = "ghp_XXXXXXXXXXXXXXXXXXXX"  # PAT with read:packages scope
 resource_group_name   = "wth-contoso-aca-rg"

@@ -193,18 +193,6 @@ resource "azurerm_container_app" "contoso" {
     identity_ids = [azurerm_user_assigned_identity.app.id]
   }
 
-  # ghcr.io credentials — PAT stored as a secret
-  secret {
-    name  = "ghcr-token"
-    value = var.github_token
-  }
-
-  registry {
-    server               = "ghcr.io"
-    username             = var.github_username
-    password_secret_name = "ghcr-token"
-  }
-
   template {
     container {
       name   = "contoso-university"

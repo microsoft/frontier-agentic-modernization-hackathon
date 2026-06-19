@@ -6,6 +6,4 @@ location           = "swedencentral"
 app_image          = "ghcr.io/microsoft/frontier-agentic-modernization-hackathon/photo-album:latest"
 db_admin_username  = "photoalbumadmin"
 db_admin_password  = "CHANGEMEComplex1!"  # must be 8-128 chars, upper+lower+digit+special
-github_username    = "your-github-username"
-github_token       = "ghp_XXXXXXXXXXXXXXXXXXXX"  # PAT with read:packages scope
 resource_group_name = "wth-photoalbum-aca-rg"

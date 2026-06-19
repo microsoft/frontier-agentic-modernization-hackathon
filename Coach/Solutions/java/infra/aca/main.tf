@@ -128,22 +128,10 @@ resource "azurerm_container_app" "photoalbum" {
     type = "SystemAssigned"
   }
 
-  # ghcr.io credentials — PAT stored as a secret
-  secret {
-    name  = "ghcr-token"
-    value = var.github_token
-  }
-
   # DB password injected directly so startup never relies solely on KV resolution timing
   secret {
     name  = "db-password"
     value = var.db_admin_password
-  }
-
-  registry {
-    server               = "ghcr.io"
-    username             = var.github_username
-    password_secret_name = "ghcr-token"
   }
 
   template {
