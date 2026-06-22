@@ -55,7 +55,13 @@ UNION ALL
 SELECT 'CatalogTypes',  COUNT(*) FROM CatalogTypes;
 ```
 
-Expected counts match the local in-memory seed data.
+Expected counts:
+
+| Table | Expected rows |
+|-------|--------------|
+| `CatalogItems` | 12 |
+| `CatalogBrands` | 4 |
+| `CatalogTypes` | 4 |
 
 ### Step 4 — End-to-End Smoke Test
 
