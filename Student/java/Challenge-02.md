@@ -29,17 +29,18 @@ Your approach should include:
 - Use `modernize plan create` with a goal that captures all the migration objectives above
 - Use `modernize plan execute` to apply the generated migration plan
 - Use GitHub Copilot Chat to resolve any compilation errors or test failures the automated migration cannot fix
-- Update `docker-compose.yml` to replace the Oracle container with a PostgreSQL container for local development
 - Update the `Dockerfile` to build on a Java 21 base image
-- Update `application.properties` (or `application.yml`) with the new datasource configuration
+- Update `application.properties` (or `application.yml`) with the new datasource and Azure Blob Storage configuration
+
+> **Note:** Do **not** modify `docker-compose.yml` — the Oracle container must remain intact for the data migration in Challenge 04. PostgreSQL runs on Azure (provisioned in Challenge 03); there is no need for a local PostgreSQL container.
 
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
 
 1. `mvn clean package` (or equivalent) succeeds with no compilation errors
-2. The application starts locally against a PostgreSQL container (`docker-compose up`)
-3. Photos can be uploaded and retrieved successfully in the running application
+2. The application configuration (`application.properties` / `application.yml`) targets Azure Database for PostgreSQL and Azure Blob Storage
+3. Photos can be uploaded and retrieved successfully in the running application (test against Azure after Challenge 03 deployment, or locally with `UseInMemoryDatabase` if needed)
 4. `modernize assess` on the updated codebase reports no remaining critical issues for the Java 8 → Java 21 / Spring Boot 2 → 3 migration
 5. The `pom.xml` reflects Spring Boot 3.x and Java 21 as the compile target
 6. **Explain to your coach** — why is the `javax.*` → `jakarta.*` namespace change one of the most impactful breaking changes in the Spring Boot 2 → 3 migration?
@@ -57,5 +58,6 @@ To complete this challenge successfully, demonstrate:
 ## Tips
 
 - The namespace change from `javax.persistence.*` to `jakarta.persistence.*` is one of the most common sources of compilation failures after a Spring Boot 2→3 migration.
-- When migrating from Oracle to PostgreSQL, pay attention to SQL dialect differences, especially around sequences, date/time types, and BLOB/CLOB handling.
+- When migrating from Oracle to PostgreSQL, pay attention to SQL dialect differences, especially around sequences, date/time types, and BLOB/CLOB handling. The application will connect to Azure Database for PostgreSQL after deployment in Challenge 03.
+- Keep the Oracle `docker-compose.yml` untouched — you will need the Oracle container running in Challenge 04 to migrate production data.
 
