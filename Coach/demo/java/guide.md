@@ -197,7 +197,7 @@ Open the VS Code terminal and run the assessment or use the GitHub Copilot moder
 
 ```bash
 cd Student/Resources/java/PhotoAlbum-Java
-modernize assess .
+modernize assess --source .
 ```
 
 or start a "Recommended Assessment" in the Copilot extension.
@@ -222,7 +222,7 @@ Once you have the results, open the assessment report in VS Code and walk throug
 **Step 1 — Generate the migration plan:**
 
 ```bash
-modernize plan create
+modernize plan create "Create the full Azure modernization plan to Azure Container Apps" --source .
 ```
 
 or if using the Copilot extension, click "Create Plan" from the assessment report.
@@ -238,7 +238,7 @@ Show the generated plan. Walk through the task list and point out the four key i
 **Step 2 — Agent executes the plan:**
 
 ```bash
-modernize plan execute "Execute the plan migrating to Java 21 and PostreSQL"
+modernize plan execute "Execute the plan migrating to Java 21 and PostgreSQL"
 ```
 
 or ask the agent in the Copilot extension to: "Execute the plan".
@@ -282,15 +282,17 @@ ora2pg -c ora2pg.conf -t COPY -o data.sql -u system -w photoalbum
 **Step 3 — Import into Azure PostgreSQL:**
 
 ```bash
-export PGPASSWORD="<admin-password>
-psql -h <azure-db-fqdn> -U <admin-user> -d photoalbum <<'SQL'
+export PGPASSWORD="<admin-password>"
+export PGUSER="psqladmin"
+export PGHOST="<host>"
+psql -h $PGHOST -U $PGUSER -d photoalbum <<'SQL'
 CREATE ROLE photoalbum LOGIN PASSWORD 'photoalbum';
 GRANT photoalbum TO psqladmin;
 SQL
 
-psql -h <azure-db-fqdn> -U <admin-user> -d photoalbum < TABLE_photoalbum.sql
-psql -h <azure-db-fqdn> -U <admin-user> -d photoalbum < SEQUENCE_photoalbum.sql
-psql -h <azure-db-fqdn> -U <admin-user> -d photoalbum < data.sql
+psql -h $PGHOST -U $PGUSER -d photoalbum < TABLE_photoalbum.sql
+psql -h $PGHOST -U $PGUSER -d photoalbum < SEQUENCE_photoalbum.sql
+psql -h $PGHOST -U $PGUSER -d photoalbum < data.sql
 ```
 
 **Step 5 — Protect the schema from accidental wipe:**
