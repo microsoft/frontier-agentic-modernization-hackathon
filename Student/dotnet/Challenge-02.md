@@ -32,7 +32,8 @@ Your approach should include:
 
 - Run `dotnet-appcat` on the ContosoUniversity project to get an initial compatibility report
 - Use `modernize plan create` with a goal that captures all migration objectives
-- Use `modernize plan execute` to apply the generated migration plan
+- Review the generated plan at `.github/modernize/modernization-plan/plan.md` before executing
+- Use `modernize plan execute` to apply the generated migration plan (run from inside the application folder — it reads the plan file automatically, no arguments needed)
 - Use GitHub Copilot Chat to resolve compilation errors that automated tools cannot handle
 - Convert `Web.config` application settings to `appsettings.json`
 - Update `NotificationService.cs` to use the Azure Service Bus SDK (`Azure.Messaging.ServiceBus`)

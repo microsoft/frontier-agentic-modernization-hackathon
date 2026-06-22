@@ -44,7 +44,11 @@ modernize plan create --goal "Migrate eShopOnWeb from ASP.NET Core 8.0 to .NET 1
   Update Directory.Packages.props TargetFramework to net10.0 and bump all package \
   versions to their .NET 10-compatible equivalents. \
   Replace Swashbuckle.AspNetCore with Microsoft.AspNetCore.OpenApi in PublicApi."
+```
 
+> **How `plan create` and `plan execute` are connected:** `modernize plan create` analyses the assessment output and saves a structured plan to `.github/modernize/modernization-plan/plan.md` inside the application folder. You can open that file to review every task the tool intends to perform before committing. `modernize plan execute` reads that same file — there is no plan ID or path to pass. Both commands must be run **from inside the application folder**.
+
+```bash
 modernize plan execute
 ```
 

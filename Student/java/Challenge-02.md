@@ -27,7 +27,8 @@ Modernize the PhotoAlbum Java application from its current state to:
 Your approach should include:
 
 - Use `modernize plan create` with a goal that captures all the migration objectives above
-- Use `modernize plan execute` to apply the generated migration plan
+- Review the generated plan at `.github/modernize/modernization-plan/plan.md` before executing
+- Use `modernize plan execute` to apply the generated migration plan (run from inside the application folder — it reads the plan file automatically, no arguments needed)
 - Use GitHub Copilot Chat to resolve any compilation errors or test failures the automated migration cannot fix
 - Update the `Dockerfile` to build on a Java 21 base image
 - Update `application.properties` (or `application.yml`) with the new datasource and Azure Blob Storage configuration
