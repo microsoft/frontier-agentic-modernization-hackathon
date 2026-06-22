@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This challenge takes the squad through a production-grade data migration from the Oracle XE database (running as a Docker container in the legacy stack) to the Azure Database for PostgreSQL Flexible Server provisioned in Challenge 03.
+This challenge takes the team through a production-grade data migration from the Oracle XE database (running as a Docker container in the legacy stack) to the Azure Database for PostgreSQL Flexible Server provisioned in Challenge 03.
 
 Use this guidance with two valid migration paths:
 - Primary path: Ora2Pg export + psql import.
@@ -52,7 +52,7 @@ Cover:
 | Azure CLI | already installed from Challenge 00 |
 | Seeded source data | Run legacy app once and upload at least 2–3 photos |
 
-The squad must have completed Challenge 03 (`terraform apply` succeeded) so the PostgreSQL server and `photoalbum` database exist.
+The team must have completed Challenge 03 (`terraform apply` succeeded) so the PostgreSQL server and `photoalbum` database exist.
 
 ---
 

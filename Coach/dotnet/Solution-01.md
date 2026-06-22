@@ -26,7 +26,7 @@ Key issues the assessment should surface:
 
 ## Debrief Discussion Guide
 
-After the squad reviews the report, facilitate a 10-minute debrief:
+After the team reviews the report, facilitate a 10-minute debrief:
 
 1. **What surprised you?** — Attendees often underestimate the `System.Web` scope
 2. **What can be automated?** — Project file format, some dependency updates, `Web.config` conversion
@@ -37,4 +37,4 @@ After the squad reviews the report, facilitate a 10-minute debrief:
 
 - The assessment report format may vary slightly between CLI and VS Code extension — both are acceptable
 - "Top 3 migration blockers" is intentionally subjective — any reasonable answer is correct
-- If the assessment does not surface MSMQ or `System.Web` as issues, the squad may have run it on the wrong folder — coach them to re-run from the `ContosoUniversity` root
+- If the assessment does not surface MSMQ or `System.Web` as issues, the team may have run it on the wrong folder — coach them to re-run from the `ContosoUniversity` root

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This is the **stretch AI-infusion challenge** for the Java track (optional, attempt only if the squad finishes Challenge 05 with time to spare). The squad extends the modernized PhotoAlbum so every photo upload triggers a vision call to Azure OpenAI and is auto-tagged. End-to-end: Terraform (Azure OpenAI account + model deployment + RBAC), Java service code (`azure-ai-openai`, `DefaultAzureCredentialBuilder`, structured JSON), Thymeleaf template updates, and verification in Azure.
+This is the **stretch AI-infusion challenge** for the Java track (optional, attempt only if the team finishes Challenge 05 with time to spare). The team extends the modernized PhotoAlbum so every photo upload triggers a vision call to Azure OpenAI and is auto-tagged. End-to-end: Terraform (Azure OpenAI account + model deployment + RBAC), Java service code (`azure-ai-openai`, `DefaultAzureCredentialBuilder`, structured JSON), Thymeleaf template updates, and verification in Azure.
 
 A working reference implementation lives under `Coach/Solutions/java/PhotoAlbum-Java/` and `Coach/Solutions/java/infra/`. Use it to diff against student work, not as a hand-out.
 
@@ -178,7 +178,7 @@ Award full credit when all five conditions hold:
 4. New uploads have non-null `caption`, `alt_text`, and ≥3 `tags` in the `photos` table.
 5. Removing the role assignment still allows uploads to succeed (only AI fields are null) — verifies the `try/catch` is in place.
 
-Partial credit is fine for time-boxed squads — the priority is **Managed Identity + a working vision call + graceful degradation**. The reanalyze endpoint and tag badges in the UI are polish.
+Partial credit is fine for time-boxed teams — the priority is **Managed Identity + a working vision call + graceful degradation**. The reanalyze endpoint and tag badges in the UI are polish.
 
 ## Time budget
 

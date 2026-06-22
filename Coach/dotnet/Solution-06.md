@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This is the **stretch AI-infusion challenge** for the .NET track (optional, attempt only if the squad finishes Challenge 05 with time to spare). The squad takes the modernized application and adds an Azure OpenAI vision call into the course-authoring flow. End-to-end: Terraform (Azure OpenAI account + model deployment + RBAC), .NET service code (`Azure.AI.OpenAI`, `DefaultAzureCredential`, structured JSON), Razor view updates, and verification in Azure.
+This is the **stretch AI-infusion challenge** for the .NET track (optional, attempt only if the team finishes Challenge 05 with time to spare). The team takes the modernized application and adds an Azure OpenAI vision call into the course-authoring flow. End-to-end: Terraform (Azure OpenAI account + model deployment + RBAC), .NET service code (`Azure.AI.OpenAI`, `DefaultAzureCredential`, structured JSON), Razor view updates, and verification in Azure.
 
 A working reference implementation lives under `Coach/Solutions/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/` and `Coach/Solutions/dotnet/infra/`. Use it to diff against student work, not as a hand-out.
 
@@ -144,7 +144,7 @@ builder.Services.AddSingleton<ICourseContentAiService>(sp =>
 
 | Issue | Hint to give |
 |---|---|
-| `401 Unauthorized` from Azure OpenAI right after `terraform apply` | RBAC propagation takes 1–2 minutes. Tell the squad to retry instead of debugging. |
+| `401 Unauthorized` from Azure OpenAI right after `terraform apply` | RBAC propagation takes 1–2 minutes. Tell the team to retry instead of debugging. |
 | `403 Forbidden` even after waiting | The role was assigned to the wrong principal. Confirm `principal_id = azurerm_container_app.contoso.identity[0].principal_id`, **not** the deployer's object id. |
 | Response is text, not JSON, and `JsonSerializer.Deserialize` throws | The student forgot `ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat()`. Also the system prompt must contain the word "JSON". |
 | `DefaultAzureCredential` works locally but fails in the Container App | Ensure `identity { type = "SystemAssigned" }` is on the `azurerm_container_app.contoso` resource and that `terraform apply` actually re-deployed the app revision. |
@@ -164,7 +164,7 @@ Award full credit when all five conditions hold:
 4. Uploading a course image visibly prefills the Review panel with description + ≥3 objectives + alt text.
 5. Killing the Azure OpenAI account (or temporarily removing the role) still allows the admin to save a course — only the AI fields are missing.
 
-Partial credit is fine for time-boxed squads — the priority is **Managed Identity + a working vision call + graceful degradation**. The Regenerate button is nice-to-have.
+Partial credit is fine for time-boxed teams — the priority is **Managed Identity + a working vision call + graceful degradation**. The Regenerate button is nice-to-have.
 
 ## Time budget
 

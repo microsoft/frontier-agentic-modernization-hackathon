@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Before diving into application modernization, you need a working local environment with all required tools installed and authenticated. This challenge ensures everyone on your squad starts from the same baseline for the **.NET track**.
+Before diving into application modernization, you need a working local environment with all required tools installed and authenticated. This challenge ensures everyone on your team starts from the same baseline for the **.NET track**.
 
 The repository uses **Git submodules** to include the sample applications. You must initialise the submodules before the source code of the legacy apps is available on your machine.
 
@@ -23,7 +23,7 @@ Set up your local development environment so you are ready to work with the .NET
 
 To see the application running in its **original, unmodified state** before starting the modernization, a Terraform configuration is provided that provisions a dedicated Azure VM and configures everything automatically.
 
-This is recommended — it gives your squad a concrete "before" picture and validates that the original app works end-to-end.
+This is recommended — it gives your team a concrete "before" picture and validates that the original app works end-to-end.
 
 **.NET app (ContosoUniversity — Windows Server + IIS + SQL Express + MSMQ):**
 - Follow the steps in [`../Resources/dotnet/infra/README.md`](../Resources/dotnet/infra/README.md)
@@ -75,6 +75,6 @@ To complete this challenge successfully, demonstrate:
 
 ## Tips
 
-- Your squad can deploy the VM while other setup steps are running.
+- Your team can deploy the VM while other setup steps are running.
 - **If `git submodule status` shows a `-` prefix**, the submodule has not been initialised. Fix it with: `git submodule update --init --recursive`
 - **If `modernize` is not found**, ensure `~/.local/bin` is on your PATH: `export PATH="$HOME/.local/bin:$PATH"` (add to `~/.bashrc` or `~/.zshrc` to persist)

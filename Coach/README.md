@@ -4,7 +4,7 @@
 
 ## Overview
 
-This hack is designed for squads of 3–5 people. It covers three parallel modernization tracks:
+This hack is designed for teams of 3–5 people. It covers three parallel modernization tracks:
 
 | Track | Application | Legacy Stack | Target Stack |
 |---|---|---|---|
@@ -12,7 +12,7 @@ This hack is designed for squads of 3–5 people. It covers three parallel moder
 | .NET | ContosoUniversity | .NET Framework 4.8 / ASP.NET MVC 5 / MSMQ | .NET 10 / ASP.NET Core / Azure Service Bus + Blob |
 | .NET 8 | eShopOnWeb | ASP.NET Core 8.0 / EF Core 8 / Swashbuckle | .NET 10 / Microsoft.AspNetCore.OpenApi / Azure Service Bus + Blob |
 
-Challenges 02 and 03 are designed to be parallelized within a squad — members can split across any combination of the three tracks.
+Challenges 02 and 03 are designed to be parallelized within a team — members can split across any combination of the three tracks.
 
 ---
 
@@ -65,7 +65,7 @@ per-track subfolders. Use these during the event — **do not share with attende
 |----------|-------------|
 | **Role** | Contributor on the subscription (Owner required only if creating new resource groups with RBAC assignments) |
 | **Region** | Any region with Azure Container Apps, Azure Database for PostgreSQL, Azure SQL, and Azure Service Bus — `eastus` or `westeurope` recommended |
-| **Azure Container Apps** | At least 1 environment per squad; Consumption plan is sufficient |
+| **Azure Container Apps** | At least 1 environment per team; Consumption plan is sufficient |
 | **Azure SQL / PostgreSQL** | Basic or Burstable SKU sufficient for the hack |
 | **Azure Service Bus** | Standard tier (required for topics; Basic does not support them) |
 | **Azure Blob Storage** | Standard LRS |
@@ -94,7 +94,7 @@ done
 | 09:30 – 10:00 | Challenge 00 — Prerequisites |
 | 10:00 – 10:30 | Mini-lecture: What is GitHub Copilot Modernization? (demo the TUI) |
 | 10:30 – 11:00 | Challenge 01 — Assessment |
-| 11:00 – 11:15 | Debrief: discuss assessment results, split squad into Java / .NET / .NET 8 tracks |
+| 11:00 – 11:15 | Debrief: discuss assessment results, split team into Java / .NET / .NET 8 tracks |
 | 11:15 – 13:00 | Challenge 02 — Modernize the application (per track) |
 | 13:00 – 14:00 | Lunch break |
 | 14:00 – 15:30 | Continue Challenge 02 |
@@ -113,7 +113,7 @@ done
 | Day 2 | AM | Ch 03–04 | Containerize & Deploy, Database Migration |
 | Day 2 | PM | Ch 05–06 | Observe & Secure, AI stretch *(optional)* |
 
-> **Tip:** The 2-day format gives squads breathing room on Challenge 02, which is the
+> **Tip:** The 2-day format gives teams breathing room on Challenge 02, which is the
 > most complex and often needs more time than a full-day event allows.
 
 ### Half-Day Event (4 hours — abbreviated)
@@ -130,7 +130,7 @@ Focus on Challenges 00–02 only. Challenges 03–05 become homework or async ex
 
 ---
 
-## Squad Size
+## Team Size
 
 - **Ideal:** 3–5 people
 - **Minimum:** 2 people (one per track in Challenge 02)
@@ -201,7 +201,7 @@ For the optional VM deployment in Challenge 00, the Terraform scripts are in:
 
 ## Cleanup
 
-Remind all squads to delete resources at the end of the event to avoid ongoing charges:
+Remind all teams to delete resources at the end of the event to avoid ongoing charges:
 
 ```bash
 # List resource groups created during the hack

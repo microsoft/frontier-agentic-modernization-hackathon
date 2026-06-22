@@ -17,7 +17,7 @@ The target state is:
 - **Azure Blob Storage** replacing the local file system uploads folder
 - **Azure SQL Database** (EF Core updated to latest)
 
-> **Note:** This challenge can be worked on in parallel with the Java track by different members of your squad.
+> **Note:** This challenge can be worked on in parallel with the Java track by different members of your team.
 
 ## Description
 

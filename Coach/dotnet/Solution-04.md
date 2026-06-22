@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This challenge takes the squad through a **production-grade data migration** from an on-premises SQL Server (LocalDB / SQL Express) to the Azure SQL Database that was provisioned in Challenge 03. Students use **Azure Database Migration Service (DMS)** — operated directly from the Azure Portal — to assess compatibility, migrate the schema, copy data, and perform cutover validation. This is a critical cutover step: the modernized application data moves into a managed, geo-redundant cloud database before post-cutover hardening.
+This challenge takes the team through a **production-grade data migration** from an on-premises SQL Server (LocalDB / SQL Express) to the Azure SQL Database that was provisioned in Challenge 03. Students use **Azure Database Migration Service (DMS)** — operated directly from the Azure Portal — to assess compatibility, migrate the schema, copy data, and perform cutover validation. This is a critical cutover step: the modernized application data moves into a managed, geo-redundant cloud database before post-cutover hardening.
 
 A working reference for the Azure infrastructure already lives in `Coach/Solutions/dotnet/infra/`. The Azure SQL Database resource (`azurerm_mssql_database.contoso`) provisioned there is the migration target.
 
@@ -35,7 +35,7 @@ Cover:
 | `sqlcmd` CLI (validation queries) | [Install sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/sqlcmd-utility) |
 | Azure CLI | already installed from Challenge 00 |
 
-The squad must have completed Challenge 03 (`terraform apply` succeeded) so the Azure SQL Server and database exist.
+The team must have completed Challenge 03 (`terraform apply` succeeded) so the Azure SQL Server and database exist.
 
 ---
 

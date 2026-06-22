@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Before diving into application modernization, you need a working local environment with all required tools installed and authenticated. This challenge ensures everyone on your squad starts from the same baseline for the **.NET 8 → .NET 10 track**.
+Before diving into application modernization, you need a working local environment with all required tools installed and authenticated. This challenge ensures everyone on your team starts from the same baseline for the **.NET 8 → .NET 10 track**.
 
 The repository uses **Git submodules** to include the eShopOnWeb sample application. You must initialise the submodule before the source code is available on your machine.
 

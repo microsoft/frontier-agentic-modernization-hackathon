@@ -13,7 +13,7 @@ The **PhotoAlbum** application was built with Spring Boot 2.7.18 on Java 8, back
 
 In this challenge you will use the GitHub Copilot Modernization tools to create and execute a migration plan that addresses all of these concerns.
 
-> **Note:** This challenge can be worked on in parallel with the .NET track by different members of your squad.
+> **Note:** This challenge can be worked on in parallel with the .NET track by different members of your team.
 
 ## Description
 
