@@ -4,14 +4,15 @@
 
 ## Overview
 
-This hack is designed for squads of 3–5 people. It covers two parallel modernization tracks:
+This hack is designed for squads of 3–5 people. It covers three parallel modernization tracks:
 
 | Track | Application | Legacy Stack | Target Stack |
 |---|---|---|---|
 | Java | PhotoAlbum | Spring Boot 2.7 / Java 8 / Oracle DB | Spring Boot 3.x / Java 21 / PostgreSQL + Azure Blob |
 | .NET | ContosoUniversity | .NET Framework 4.8 / ASP.NET MVC 5 / MSMQ | .NET 10 / ASP.NET Core / Azure Service Bus + Blob |
+| .NET 8 | eShopOnWeb | ASP.NET Core 8.0 / EF Core 8 / Swashbuckle | .NET 10 / Microsoft.AspNetCore.OpenApi / Azure Service Bus + Blob |
 
-Challenges 02 and 03 are designed to be parallelized within a squad — some members take Java, others take .NET. Both tracks converge in Challenge 03 (deployment).
+Challenges 02 and 03 are designed to be parallelized within a squad — members can split across any combination of the three tracks.
 
 ---
 
@@ -43,6 +44,18 @@ per-track subfolders. Use these during the event — **do not share with attende
 | 04 | Migrate the Database | [java/Solution-04.md](./java/Solution-04.md) |
 | 05 | Observe & Secure | [java/Solution-05.md](./java/Solution-05.md) |
 | 06 | Infuse AI *(stretch)* | [java/Solution-06.md](./java/Solution-06.md) |
+
+### .NET 8 Track (eShopOnWeb)
+
+| Challenge | Title | Coach Notes |
+|-----------|-------|-------------|
+| 00 | Prerequisites | [net8/Solution-00.md](./net8/Solution-00.md) |
+| 01 | Assess the eShopOnWeb Application | [net8/Solution-01.md](./net8/Solution-01.md) |
+| 02 | Modernize to .NET 10 | [net8/Solution-02.md](./net8/Solution-02.md) |
+| 03 | Containerize, Cloud-Modernize & Deploy | [net8/Solution-03.md](./net8/Solution-03.md) |
+| 04 | Migrate the Database to Azure SQL | [net8/Solution-04.md](./net8/Solution-04.md) |
+| 05 | Observe & Secure | [net8/Solution-05.md](./net8/Solution-05.md) |
+| 06 | Infuse AI *(stretch)* | [net8/Solution-06.md](./net8/Solution-06.md) |
 
 ---
 
@@ -81,7 +94,7 @@ done
 | 09:30 – 10:00 | Challenge 00 — Prerequisites |
 | 10:00 – 10:30 | Mini-lecture: What is GitHub Copilot Modernization? (demo the TUI) |
 | 10:30 – 11:00 | Challenge 01 — Assessment |
-| 11:00 – 11:15 | Debrief: discuss assessment results, split squad into Java/.NET tracks |
+| 11:00 – 11:15 | Debrief: discuss assessment results, split squad into Java / .NET / .NET 8 tracks |
 | 11:15 – 13:00 | Challenge 02 — Modernize the application (per track) |
 | 13:00 – 14:00 | Lunch break |
 | 14:00 – 15:30 | Continue Challenge 02 |
@@ -173,6 +186,7 @@ git submodule update --init --recursive --force
 # Verify submodule content is present
 ls Student/Resources/dotnet/dotnet-migration-copilot-samples/ContosoUniversity/
 ls Student/Resources/java/PhotoAlbum-Java/
+ls Student/Resources/net8/eShopOnWeb/
 ```
 
 If the Dev Container is not working, attendees can install tools directly on their host
@@ -181,6 +195,7 @@ machine following the Prerequisites section of the [hack README](../README.md).
 For the optional VM deployment in Challenge 00, the Terraform scripts are in:
 - `.NET:` `Student/Resources/dotnet/infra/`
 - `Java:` `Student/Resources/java/infra/`
+- `.NET 8:` `Student/Resources/net8/infra/`
 
 ---
 
