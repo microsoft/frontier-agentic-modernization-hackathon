@@ -41,11 +41,7 @@ photo storage from Oracle BLOBs to Azure Blob Storage
    - Use `BlobServiceClient` to upload/download bytes
    - Return blob URLs or SAS tokens instead of database-stored bytes
 
-5. Update `docker-compose.yml`:
-   - Replace Oracle container with `postgres:16`
-   - Update environment variables accordingly
-
-6. Update `Dockerfile`:
+5. Update `Dockerfile`:
    - Change base image from `openjdk:8` to `eclipse-temurin:21-jre` (or equivalent)
 
 ## Common Pitfalls
@@ -55,11 +51,13 @@ photo storage from Oracle BLOBs to Azure Blob Storage
 | `javax.persistence` import errors after upgrade | Ask: "What changed in the javax → jakarta namespace in Spring Boot 3?" |
 | Oracle SQL syntax in queries (e.g., `SYSDATE`, sequences) | Ask: "PostgreSQL uses `NOW()` and `SERIAL` — where are Oracle-specific functions used?" |
 | `spring.jpa.hibernate.ddl-auto=create` dropping the table on restart | Suggest changing to `validate` after the first run |
-| Azure Blob Storage credentials during local dev | Suggest using the Azurite emulator or a real Azure account |
+| Azure Blob Storage credentials during local dev | Suggest connecting to a real Azure Storage account or using the Azurite VS Code extension (`Azurite` by Microsoft) for local emulation |
+| Team modified `docker-compose.yml` to add PostgreSQL | Remind them the Oracle container is needed in Challenge 04 — they should revert the change |
 | Build fails due to Hibernate 6 breaking changes | Spring Boot 3 ships with Hibernate 6. Ask Copilot Chat to explain the errors. |
 
 ## Success Criteria Notes
 
 - `mvn clean package` must succeed — this is binary (pass/fail)
-- Local test against PostgreSQL is the key functional verification
+- Functional verification happens after deployment to Azure in Challenge 03 — there is no local PostgreSQL container (PostgreSQL runs on Azure)
 - `modernize assess` after migration should show no critical issues for the Spring Boot 2→3 / Java 8→21 migration — minor warnings are acceptable
+- Remind teams **not** to modify `docker-compose.yml` — the Oracle container must stay intact for the data migration in Challenge 04

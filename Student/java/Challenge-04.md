@@ -33,21 +33,21 @@ Verify installation: `ora2pg --version`
 
 **Export the Oracle schema and data using Ora2Pg**
 
-Create an `ora2pg.conf` configuration file. Use the reference template from [Coach Resources](../../Coach/Solutions/java/ora2pg.conf):
+Create an `ora2pg.conf` configuration file. A ready-to-use reference template is provided at [`../Resources/java/ora2pg.conf`](../Resources/java/ora2pg.conf). Copy it and adjust the connection settings:
 
 ```ini
-[ora2pg]
-# Oracle source connection
-ORACLE_HOME=/usr/lib/oracle/...  # or leave blank if sqlplus/Oracle libs are in PATH
-ORACLE_DSN=dbi:Oracle:host=localhost;sid=FREEPDB1
-ORACLE_USER=photoalbum
-ORACLE_PASSWORD=photoalbum
+# Ora2Pg directives use TAB/space as separator — NOT '='
+# (using '=' causes the whole "KEY=value" to be read as the directive name)
 
-# Export schema and data
-SCHEMA=PHOTOALBUM
-OWNER=photoalbum
-TYPE=TABLE,SEQUENCE,INDEX
-EXPORT_SCHEMA=1
+ORACLE_DSN	dbi:Oracle:host=localhost;port=1521;service_name=FREEPDB1
+ORACLE_USER	photoalbum
+ORACLE_PWD	photoalbum
+
+SCHEMA	PHOTOALBUM
+OWNER	photoalbum
+TYPE	TABLE,SEQUENCE,INDEX
+EXPORT_SCHEMA	1
+OUTPUT	photoalbum.sql
 ```
 
 Run Ora2Pg to generate a SQL dump:
