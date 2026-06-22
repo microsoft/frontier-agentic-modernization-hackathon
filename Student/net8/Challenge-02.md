@@ -79,7 +79,7 @@ To complete this challenge successfully, demonstrate:
 4. `global.json` shows `"version": "10.0.x"`
 5. `Directory.Packages.props` shows `<TargetFramework>net10.0</TargetFramework>` and no `8.0.x` versions remain
 6. No `Swashbuckle` references exist anywhere in the solution: `grep -r Swashbuckle src/` returns nothing
-7. The `BlazorAdmin` app loads in the browser at `https://localhost:5001/admin`
+7. *(Stretch)* The `BlazorAdmin` app loads in the browser at `https://localhost:5001/admin` — if WASM package versions are blocking progress, move on and revisit at the end
 8. **Explain to your coach** — why was Swashbuckle removed from ASP.NET Core default templates in .NET 9, and what does `MapOpenApi()` do differently from the old `UseSwagger()` middleware?
 9. **Explain to your coach** — what does `ManagePackageVersionsCentrally` in `Directory.Packages.props` mean, and why does it make the .NET 10 upgrade both convenient and risky?
 
