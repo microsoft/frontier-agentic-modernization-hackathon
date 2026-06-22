@@ -22,7 +22,7 @@ Extend the ContosoUniversity .NET application end-to-end with an AI-assisted cou
 
 - Add an `azurerm_cognitive_account` resource of kind `OpenAI`.
 - Add an `azurerm_cognitive_deployment` for the **`gpt-4.1-mini`** model (vision-capable).
-- Grant the Container App's **system-assigned managed identity** the `Cognitive Services OpenAI User` role on the OpenAI account.
+- Grant the Container App's **user-assigned managed identity** the `Cognitive Services OpenAI User` role on the OpenAI account.
 - Expose two new Container App env vars to the application:
   - `AzureOpenAI__Endpoint` → the OpenAI account endpoint.
   - `AzureOpenAI__Deployment` → the `gpt-4.1-mini` deployment name.

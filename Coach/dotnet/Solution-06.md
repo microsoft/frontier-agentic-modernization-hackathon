@@ -67,7 +67,7 @@ resource "azurerm_cognitive_deployment" "gpt41_mini" {
 resource "azurerm_role_assignment" "aoai_user" {
   scope                = azurerm_cognitive_account.openai.id
   role_definition_name = "Cognitive Services OpenAI User"
-  principal_id         = azurerm_container_app.contoso.identity[0].principal_id
+  principal_id         = azurerm_user_assigned_identity.app.principal_id
 }
 ```
 
@@ -147,7 +147,7 @@ builder.Services.AddSingleton<ICourseContentAiService>(sp =>
 | `401 Unauthorized` from Azure OpenAI right after `terraform apply` | RBAC propagation takes 1–2 minutes. Tell the team to retry instead of debugging. |
 | `403 Forbidden` even after waiting | The role was assigned to the wrong principal. Confirm `principal_id = azurerm_container_app.contoso.identity[0].principal_id`, **not** the deployer's object id. |
 | Response is text, not JSON, and `JsonSerializer.Deserialize` throws | The student forgot `ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat()`. Also the system prompt must contain the word "JSON". |
-| `DefaultAzureCredential` works locally but fails in the Container App | Ensure `identity { type = "SystemAssigned" }` is on the `azurerm_container_app.contoso` resource and that `terraform apply` actually re-deployed the app revision. |
+| `DefaultAzureCredential` works locally but fails in the Container App | Ensure `azurerm_user_assigned_identity` is created, the Container App has `identity { type = "UserAssigned"; identity_ids = [azurerm_user_assigned_identity.app.id] }`, and that `terraform apply` actually re-deployed the app revision. |
 | Vision API rejects the image | The base64 `data:` URI MIME must match the actual image bytes. Reuse the `IFormFile.ContentType` value, do not infer from extension. |
 | Quota / model not found errors | `gpt-4.1-mini` is region-gated. Stick to `swedencentral` or `eastus2` (the default in `variables.tf` is `swedencentral`). If quota is `0`, request 50K TPM in the Azure portal — coach has a fallback subscription. |
 | Upload fails because AI call timed out | The AI call was not wrapped in `try/catch`. The service must return `null` on failure and the controller must continue. |

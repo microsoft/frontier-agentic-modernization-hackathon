@@ -37,7 +37,7 @@ No further code changes are needed — requests, dependencies, and exceptions ar
 ## Key Vault + Managed Identity – .NET
 
 1. Provision Key Vault and store secrets (SQL connection string, Service Bus connection string, Storage account key, etc.)
-2. Assign the Container App's system-assigned identity the **Key Vault Secrets User** role
+2. Assign the Container App's **user-assigned managed identity** the **Key Vault Secrets User** role
 3. Use the Azure Container Apps Key Vault secret reference feature, or add the `Azure.Extensions.AspNetCore.Configuration.Secrets` package and configure in `Program.cs`:
    ```csharp
    builder.Configuration.AddAzureKeyVault(
@@ -50,7 +50,7 @@ No further code changes are needed — requests, dependencies, and exceptions ar
 | Issue | Hint to give |
 |---|---|
 | `AddApplicationInsightsTelemetry` not picking up connection string | The env var must be named `APPLICATIONINSIGHTS_CONNECTION_STRING` exactly |
-| Managed Identity not assigned after `terraform apply` | Requires `identity { type = "SystemAssigned" }` in the Container App Terraform resource |
+| Managed Identity not assigned after `terraform apply` | Requires `azurerm_user_assigned_identity` resource and `identity { type = "UserAssigned"; identity_ids = [...] }` in the Container App Terraform resource |
 | Key Vault soft delete prevents `terraform destroy` + reapply | Set `soft_delete_retention_days = 7` and use `purge_protection_enabled = false` for dev environments |
 | `DefaultAzureCredential` fails locally but works in Azure | Locally it falls back to `az login` credentials — run `az login` before testing locally |
 | Docker build context excludes `publish/` folder | Ensure `COPY ./publish .` aligns with the Dockerfile `WORKDIR` |
