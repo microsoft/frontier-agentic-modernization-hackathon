@@ -17,7 +17,7 @@ Cover:
 ## Expected Assessment Findings – .NET (ContosoUniversity)
 
 Key issues the assessment should surface:
-- **`System.Messaging` (MSMQ):** Not supported in .NET Core/5+ — critical blocker
+- **`System.Messaging` (MSMQ):** Not supported in .NET Core/5+ — mandatory blocker
 - **`System.Web`:** The entire ASP.NET legacy stack — all controllers, filters, `HttpContext` must be migrated
 - **`packages.config` / legacy `.csproj`:** Must be converted to SDK-style project
 - **`Global.asax`:** Must be migrated to `Program.cs` host builder

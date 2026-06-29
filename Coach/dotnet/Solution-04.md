@@ -202,7 +202,7 @@ The BACPAC approach migrates both schema and data in one step but requires SQL a
 
 - [Azure Database Migration Service overview](https://learn.microsoft.com/azure/dms/dms-overview)
 - [Migrate SQL Server to Azure SQL Database (offline)](https://learn.microsoft.com/azure/dms/tutorial-sql-server-to-azure-sql)
-- [Database Migration Assistant (DMA)](https://learn.microsoft.com/sql/dma/dma-overview)
+- [SQL Server to Azure SQL Database migration guide](https://learn.microsoft.com/data-migration/sql-server/database/guide-azure-sql-database)
 - [sqlpackage Export / Import (BACPAC)](https://learn.microsoft.com/sql/tools/sqlpackage/sqlpackage-export)
 - [Azure SQL Database connection strings](https://learn.microsoft.com/azure/azure-sql/database/connect-query-content-reference-guide)
 - [Azure SQL firewall rules](https://learn.microsoft.com/azure/azure-sql/database/firewall-configure)

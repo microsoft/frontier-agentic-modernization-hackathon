@@ -152,9 +152,9 @@ SPRING_JPA_HIBERNATE_DDL_AUTO=validate
 ## Learning Resources
 
 - [Ora2Pg Documentation](https://github.com/darold/ora2pg)
-- [Ora2Pg Configuration Reference](https://ora2pg.darold.net/configuration.html)
+- [Ora2Pg Configuration Reference](https://ora2pg.darold.net/docs)
 - [VS Code PostgreSQL extension (`ms-ossdata.vscode-pgsql`)](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql)
-- [Oracle to Azure Database for PostgreSQL Schema and Application Conversion (Preview)](https://learn.microsoft.com/azure/postgresql/migrate/oracle/schema-application-conversion)
+- [Oracle to Azure Database for PostgreSQL Flexible Server — Ora2Pg Migration Guide](https://learn.microsoft.com/azure/postgresql/migrate/oracle-migration/how-to-migrate-oracle-ora2pg)
 - [Oracle to PostgreSQL migration guidance](https://learn.microsoft.com/azure/postgresql/migrate/how-to-migrate-from-oracle)
 - [Azure Database for PostgreSQL Flexible Server overview](https://learn.microsoft.com/azure/postgresql/flexible-server/overview)
 - [psql reference](https://www.postgresql.org/docs/current/app-psql.html)

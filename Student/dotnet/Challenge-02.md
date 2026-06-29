@@ -30,10 +30,9 @@ Modernize the ContosoUniversity .NET application to:
 
 Your approach should include:
 
-- Run `dotnet-appcat` on the ContosoUniversity project to get an initial compatibility report
-- Use `modernize plan create` with a goal that captures all migration objectives
-- Review the generated plan at `.github/modernize/modernization-plan/plan.md` before executing
-- Use `modernize plan execute` to apply the generated migration plan (run from inside the application folder — it reads the plan file automatically, no arguments needed)
+- Use the GitHub Copilot Modernization tool to generate a migration plan with a goal that captures all migration objectives above
+- Review the generated migration plan before executing it
+- Execute the migration plan using the appropriate tool command
 - Use GitHub Copilot Chat to resolve compilation errors that automated tools cannot handle
 - Convert `Web.config` application settings to `appsettings.json`
 - Update `NotificationService.cs` to use the Azure Service Bus SDK (`Azure.Messaging.ServiceBus`)
@@ -43,11 +42,11 @@ Your approach should include:
 
 To complete this challenge successfully, demonstrate:
 
-1. `dotnet build` succeeds with no errors targeting .NET 10
-2. `dotnet run` starts the application without runtime errors
+1. The application builds successfully with no errors targeting .NET 10
+2. The application starts without runtime errors
 3. The Notifications feature uses Azure Service Bus (show the `NotificationService.cs` using `ServiceBusClient`)
 4. File upload functionality references Azure Blob Storage (show the upload controller using `BlobContainerClient`)
-5. `modernize assess` on the updated codebase reports no remaining critical issues for the .NET Framework 4.8 → .NET 10 migration
+5. A fresh assessment on the updated codebase reports no remaining **mandatory blockers** for the .NET Framework 4.8 → .NET 10 migration
 6. No references to `System.Messaging`, `System.Web`, or `packages.config` remain
 7. **Explain to your coach** — why was `System.Web` never ported to .NET Core? What does this mean for every controller, filter, and configuration that references it?
 8. **Explain to your coach** — what did `modernize plan execute` do that you could not have accomplished with a bulk find-and-replace?
@@ -59,11 +58,10 @@ To complete this challenge successfully, demonstrate:
 - [Migrate from ASP.NET MVC to ASP.NET Core MVC](https://learn.microsoft.com/aspnet/core/migration/mvc)
 - [Azure Service Bus SDK for .NET](https://learn.microsoft.com/azure/service-bus-messaging/service-bus-dotnet-get-started-with-queues)
 - [Azure Blob Storage SDK for .NET](https://learn.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-dotnet)
-- [Modernization CLI — plan commands](https://learn.microsoft.com/azure/developer/github-copilot-app-modernization/modernization-agent/cli-commands)
 
 ## Tips
 
-- After migrating to SDK-style `.csproj`, run `dotnet build` early and often to catch issues incrementally rather than all at once.
+- Build the application early and often after each significant change to catch issues incrementally rather than all at once.
 - `Global.asax` startup logic must be migrated to `Program.cs` using the ASP.NET Core host builder pattern.
 - The `HtmlHelper` and `UrlHelper` extension methods work differently in ASP.NET Core Tag Helpers — Copilot Chat can help you convert Razor views.
 

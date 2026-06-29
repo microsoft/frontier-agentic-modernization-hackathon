@@ -20,8 +20,8 @@ Containerize and deploy the modernized ContosoUniversity .NET application to Azu
   - Azure Service Bus namespace and queue
 
 **Deployment steps:**
-- Build and push the container image to Azure Container Registry (or GitHub Container Registry)
-- Apply the Terraform configuration: `terraform init && terraform apply`
+- Build and push the container image to a container registry (Azure Container Registry or GitHub Container Registry)
+- Apply the Terraform configuration to provision the infrastructure
 - Verify that the deployed application is reachable via its Azure Container Apps URL
 - Confirm that all CRUD operations work and the Service Bus integration is active
 
@@ -29,10 +29,10 @@ Containerize and deploy the modernized ContosoUniversity .NET application to Azu
 
 To complete this challenge successfully, demonstrate:
 
-1. The container image builds successfully with `docker build`
-2. `terraform apply` completes without errors
+1. The container image builds successfully and is pushed to a container registry
+2. The Terraform configuration applies without errors and all resources are provisioned
 3. The ContosoUniversity .NET app is accessible at its Azure Container Apps URL and all CRUD operations work
-4. Azure Portal shows active connections from the Container App to Azure SQL Database, Azure Service Bus, and Azure Blob Storage
+4. The deployed application can successfully read and write to Azure SQL Database, send messages via Azure Service Bus, and upload files to Azure Blob Storage
 5. No MSMQ or local file system dependencies remain anywhere in the infrastructure
 6. **Explain to your coach** — why must connection strings and credentials never be baked into the container image? How does your Terraform configuration handle secret injection at runtime?
 
@@ -48,6 +48,6 @@ To complete this challenge successfully, demonstrate:
 ## Tips
 
 - Azure Container Apps can pull images directly from a registry. Make sure your Container App is configured with the correct registry credentials or uses Managed Identity for ACR access.
-- Use Terraform `output` values to retrieve the Container App URL after `terraform apply`.
+- After applying your Terraform configuration, check the outputs to retrieve the Container App URL.
 - Connection strings for Azure services should be passed to the Container App as **environment variables** or **secrets** — do not hard-code them in the container image.
 

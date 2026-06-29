@@ -17,136 +17,63 @@ Perform a complete offline database migration from the legacy Oracle XE database
 
 **Prepare the source**
 
-- Start the legacy Oracle stack (`docker compose up -d` in `Resources/java/PhotoAlbum-Java/`).
-- Ensure the Oracle `photoalbum` schema contains data by running the legacy application once and uploading at least 2–3 photos.
-- Note the row count in `photoalbum.photos` — you will verify this count matches after migration.
+- Start the legacy Oracle stack (from `Resources/java/PhotoAlbum-Java/`) and ensure the `photoalbum` schema contains data by uploading at least 2–3 photos through the running legacy application.
+- Note the photo row count — you will verify this number matches exactly after migration.
 
 **Path 1 (Primary): Ora2Pg + psql**
 
-Ora2Pg is an Oracle-to-PostgreSQL converter. Install it on your local machine:
+Ora2Pg is an open-source Oracle-to-PostgreSQL migration tool. Research how to install it for your OS and verify it is working before proceeding.
 
-- **macOS**: `brew install ora2pg`
-- **Linux (Ubuntu/Debian)**: `sudo apt-get install -y perl cpanminus && sudo cpanm DBD::Oracle Ora2Pg` (or `sudo apt-get install -y ora2pg` if available)
-- **Windows**: Download from [Ora2Pg GitHub releases](https://github.com/darold/ora2pg/releases) or use WSL
+A ready-to-use configuration template is provided at [`../Resources/java/ora2pg.conf`](../Resources/java/ora2pg.conf) — copy it, adjust the Oracle connection details to match your running container, and use it to export the schema and data as a PostgreSQL-compatible SQL script.
 
-Verify installation: `ora2pg --version`
+Once you have the export, import it into your Azure Database for PostgreSQL Flexible Server using your preferred PostgreSQL client tool. The connection details for the target database are available from the Terraform outputs you produced in Challenge 03.
 
-**Export the Oracle schema and data using Ora2Pg**
+**Path 2 (Alternative): VS Code PostgreSQL extension (Preview)**
 
-Create an `ora2pg.conf` configuration file. A ready-to-use reference template is provided at [`../Resources/java/ora2pg.conf`](../Resources/java/ora2pg.conf). Copy it and adjust the connection settings:
+If your environment supports it, the [PostgreSQL for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql) extension provides an Oracle-to-PostgreSQL migration workflow with AI-assisted schema and application conversion.
 
-```ini
-# Ora2Pg directives use TAB/space as separator — NOT '='
-# (using '=' causes the whole "KEY=value" to be read as the directive name)
+Install the extension, connect to both your Oracle source and Azure PostgreSQL target, and follow the Schema Conversion workflow. Review all flagged items before applying changes to the target database.
 
-ORACLE_DSN	dbi:Oracle:host=localhost;port=1521;service_name=FREEPDB1
-ORACLE_USER	photoalbum
-ORACLE_PWD	photoalbum
-
-SCHEMA	PHOTOALBUM
-OWNER	photoalbum
-TYPE	TABLE,SEQUENCE,INDEX
-EXPORT_SCHEMA	1
-OUTPUT	photoalbum.sql
-```
-
-Run Ora2Pg to generate a SQL dump:
-
-```bash
-ora2pg -c ora2pg.conf -o ./photoalbum.sql
-```
-
-This creates a PostgreSQL-compatible SQL script containing:
-- Table definitions (Oracle types mapped to PostgreSQL: `VARCHAR2` → `VARCHAR`, `BLOB` → `BYTEA`, etc.)
-- Sequences and indexes
-- Data insert statements
-
-**Migrate to Azure PostgreSQL**
-
-1. Get the Azure PostgreSQL Flexible Server connection details:
-   ```bash
-   cd Resources/java/infra/
-   terraform output db_fqdn  # e.g., wth-photoalbum-db.postgres.database.azure.com
-   terraform output db_admin_username  # e.g., azureadmin@wth-photoalbum-db
-   ```
-
-2. Connect to Azure PostgreSQL using `psql` and import the SQL dump:
-   ```bash
-   export PGPASSWORD="<your-db-admin-password>"
-   psql -h <db-fqdn> -U <admin-user> -d photoalbum < photoalbum.sql
-   ```
-   (Replace placeholders with actual values from `terraform output`.)
-
-3. Monitor the import for errors (should complete without fatal errors).
-
-**Path 2 (Alternative): VS Code PostgreSQL extension + Preview conversion workflow**
-
-If your environment has Preview migration features enabled, you can also run:
-
-1. Install [PostgreSQL for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql).
-2. Open the Oracle-to-PostgreSQL migration workspace in the extension.
-3. Run **Schema Conversion (Preview)** and review all flagged **Review Tasks**.
-4. Validate converted schema objects in the scratch validation environment.
-5. Apply/deploy approved schema changes to the target Azure PostgreSQL database.
-6. (Recommended) Run **Application Conversion (Preview)** after schema conversion so code conversion uses schema context.
-7. Review migration report + file diffs and apply required code changes.
-
-> **Note:** If Preview conversion features are unavailable, continue with Path 1 (Ora2Pg + `psql`).
+> **Note:** If the Preview migration features are unavailable in your environment, use Path 1.
 
 **Critical: protect the migrated data**
 
-- The modernized application has `spring.jpa.hibernate.ddl-auto=create` in `application.properties`. This value **drops and recreates all tables** on every application start — which would wipe the freshly migrated data.
-- Change this setting to `validate` before starting or redeploying the modernized application against the populated PostgreSQL database.
+The modernized Spring Boot application has a Hibernate setting that controls what happens to the database schema on startup. The wrong value will silently **drop and recreate all tables** the first time the application starts — wiping every migrated row. Identify this setting, understand the difference between its values, and update it appropriately before redeploying the application against the populated PostgreSQL database.
 
-**Validation**
+**Validate**
 
-- Connect to the Azure PostgreSQL target using `psql` or the Azure Portal Query editor.
-- Run row-count queries to confirm the `photos` table count matches the Oracle source.
-- Spot-check that image binary data (`photo_data` column) was converted from Oracle `BLOB` to PostgreSQL `BYTEA` correctly.
-- Start the modernized application pointing at Azure PostgreSQL and confirm the photo gallery loads with the migrated photos.
-
-**Decommission the legacy database**
-
-- Once the migrated data is validated and the modernized application is running on Azure, stop and remove the Oracle Docker container:
-  ```bash
-  docker compose down -v
-  ```
-- This is the definitive proof that the migration succeeded and the legacy system is no longer needed.
+After the import, verify that:
+- The row count in the PostgreSQL `photos` table matches the Oracle source
+- Image binary data was correctly converted from Oracle's format to PostgreSQL's equivalent
+- The deployed PhotoAlbum application displays the migrated photos without requiring re-upload
 
 ## Success Criteria
 
 To complete this challenge, demonstrate:
 
-1. Migration completes successfully using either valid path:
-   - Path 1: Ora2Pg export + `psql` import, or
-   - Path 2: Preview conversion workflow in VS Code PostgreSQL extension (`ms-ossdata.vscode-pgsql`).
-2. If Path 2 is used, all flagged Review Tasks are addressed or documented before final validation.
-3. The `photos` table in Azure PostgreSQL has a **row count matching the Oracle source** — verified with a `SELECT COUNT(*) FROM photos` query on both sides.
-4. The `photo_data` column in PostgreSQL contains `BYTEA` data (not null) for rows that had blobs in Oracle.
-5. The deployed PhotoAlbum Container App displays the migrated photos in the gallery — no re-upload required.
-6. `spring.jpa.hibernate.ddl-auto` is set to `validate` (not `create`) in the running configuration — confirmed via `az containerapp show`.
-7. The Oracle Docker container has been **stopped and removed** (`docker ps` shows no `oracle-db` container).
-8. No database passwords appear in plain text in `application.properties` or Container App environment variables — credentials come from Azure Key Vault.
-9. **Explain to your coach** — what is the difference between the two migration paths (Ora2Pg vs. AI-assisted schema conversion)? In what situation would you choose each?
+1. Migration completes successfully using either valid path.
+2. The `photos` table in Azure PostgreSQL has a row count matching the Oracle source — verified by querying both databases.
+3. Image data was correctly converted and is present in the PostgreSQL rows that had blobs in Oracle.
+4. The deployed PhotoAlbum Container App displays the migrated photos in the gallery — no re-upload required.
+5. No database passwords appear in plain text in `application.properties` or Container App environment variables — credentials come from Azure Key Vault.
 
 ## Learning Resources
 
 - [Ora2Pg Documentation](https://github.com/darold/ora2pg)
-- [Ora2Pg Installation Guide](https://ora2pg.darold.net/installation.html)
-- [Ora2Pg Configuration Reference](https://ora2pg.darold.net/configuration.html)
+- [Ora2Pg Installation Guide](https://ora2pg.darold.net/docs/installation)
+- [Ora2Pg Configuration Reference](https://ora2pg.darold.net/docs)
 - [VS Code PostgreSQL extension (`ms-ossdata.vscode-pgsql`)](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql)
-- [Oracle to Azure Database for PostgreSQL Schema and Application Conversion (Preview)](https://learn.microsoft.com/azure/postgresql/migrate/oracle/schema-application-conversion)
+- [Oracle to Azure Database for PostgreSQL Flexible Server — Ora2Pg Migration Guide](https://learn.microsoft.com/azure/postgresql/migrate/oracle-migration/how-to-migrate-oracle-ora2pg)
 - [Oracle to PostgreSQL data type mapping reference](https://learn.microsoft.com/azure/postgresql/migrate/how-to-migrate-from-oracle#data-types)
 - [Azure Database for PostgreSQL Flexible Server overview](https://learn.microsoft.com/azure/postgresql/flexible-server/overview)
-- [Self-hosted Integration Runtime installation](https://learn.microsoft.com/azure/data-factory/create-self-hosted-integration-runtime)
 - [`psql` — PostgreSQL interactive terminal](https://www.postgresql.org/docs/current/app-psql.html)
-- [Hibernate `ddl-auto` reference](https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)
+- [Hibernate `ddl-auto` reference](https://docs.hibernate.org/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)
 
 ## Tips
 
-- Run `terraform output db_fqdn` inside `Resources/java/infra/` to retrieve the PostgreSQL Flexible Server hostname provisioned in Challenge 03.
-- If you encounter `psql: error: FATAL: SSL connection error`, or similar SSL issues, add `-sslmode=disable` to your `psql` command: `psql -h <db-fqdn> ... -sslmode=disable < photoalbum.sql` or disable SSL in Azure Portal (Connection Security).
-- If Ora2Pg cannot connect to Oracle, ensure the Oracle container is running (`docker ps | grep oracle-db`), Oracle is listening on port 1521, the TNS connection string is correct (`ORACLE_DSN=dbi:Oracle:host=localhost;sid=FREEPDB1`), and the `photoalbum` user credentials are correct.
-- Set `spring.jpa.hibernate.ddl-auto=validate` (or env var `SPRING_JPA_HIBERNATE_DDL_AUTO=validate`) **before** pointing the application at the populated PostgreSQL database. With `create`, Hibernate will silently destroy all migrated data on the first application start.
-- Ora2Pg automatically converts Oracle `BLOB` to PostgreSQL `BYTEA`. The entity definition does not need to change; Hibernate handles both transparently.
+- Your Challenge 03 Terraform outputs contain the PostgreSQL Flexible Server hostname and admin credentials you need — check the `infra/` directory outputs.
+- When configuring Ora2Pg, pay close attention to the Oracle DSN format, schema name, and the separator between configuration directives — these are common sources of silent failures.
+- If you encounter SSL errors connecting to Azure PostgreSQL, check the Connection Security settings in the Azure Portal.
+- Ora2Pg handles the Oracle `BLOB` → PostgreSQL `BYTEA` type conversion automatically — you do not need to change your JPA entity definitions.
+- Hibernate has a setting that controls whether tables are created, updated, or only validated on application start. Review what each value means before redeploying the application against your freshly migrated data.
 

@@ -17,23 +17,7 @@ In Challenge 03 you provisioned an Azure SQL Database and deployed containers th
 
 ### Step 1 — Apply EF Core Migrations to Azure SQL
 
-```bash
-cd Student/Resources/net8/eShopOnWeb
-
-# Catalog database
-dotnet ef database update \
-  --context CatalogContext \
-  --project src/Infrastructure/Infrastructure.csproj \
-  --startup-project src/Web/Web.csproj \
-  --connection "<azure-sql-catalog-connection-string>"
-
-# Identity database
-dotnet ef database update \
-  --context AppIdentityDbContext \
-  --project src/Infrastructure/Infrastructure.csproj \
-  --startup-project src/Web/Web.csproj \
-  --connection "<azure-sql-identity-connection-string>"
-```
+Use the EF Core CLI to apply migrations for both contexts against your Azure SQL databases provisioned in Challenge 03. Each context (`CatalogContext` and `AppIdentityDbContext`) targets a separate database and must be applied independently. Look up the EF Core CLI `database update` command and the options for targeting a specific connection string without modifying `appsettings.json`.
 
 ### Step 2 — Seed and Validate Data
 
@@ -45,17 +29,7 @@ The application seeds data on first startup when the database is empty. Trigger 
 
 ### Step 3 — Row-Parity Check
 
-Run the following against your Azure SQL Catalog database:
-
-```sql
-SELECT 'CatalogItems'  AS [Table], COUNT(*) AS [Rows] FROM CatalogItems
-UNION ALL
-SELECT 'CatalogBrands', COUNT(*) FROM CatalogBrands
-UNION ALL
-SELECT 'CatalogTypes',  COUNT(*) FROM CatalogTypes;
-```
-
-Expected counts:
+Query the Azure SQL Catalog database to verify the seeded row counts match the expected values:
 
 | Table | Expected rows |
 |-------|--------------|
@@ -74,7 +48,7 @@ Expected counts:
 
 To complete this challenge successfully, demonstrate:
 
-1. Both `dotnet ef database update` commands complete without errors against Azure SQL
+1. Both EF Core migration commands complete without errors against Azure SQL
 2. The catalog page shows the seeded products when running fully on Azure
 3. Login with `demouser@microsoft.com` / `Pass@word1` succeeds
 4. Row counts in Azure SQL match expected seed data
@@ -90,7 +64,7 @@ To complete this challenge successfully, demonstrate:
 
 ## Tips
 
-- Use the `--connection` flag on `dotnet ef database update` to target Azure SQL without modifying `appsettings.json`.
-- If you see `Cannot open server requested by the login`, add your IP to the Azure SQL firewall rules in the portal.
-- The two `DbContext` migration histories are tracked independently — run both `database update` commands separately.
-- If EF Core reports a migration mismatch after the .NET 10 upgrade: `dotnet ef database drop` then `dotnet ef database update` to recreate from scratch.
+- Your Challenge 03 Terraform outputs contain the Azure SQL Server FQDNs and database names you need.
+- The EF Core CLI accepts a `--connection` flag to target a specific connection string without modifying `appsettings.json` — useful for one-off migration runs against Azure.
+- The two `DbContext` migration histories are tracked independently — run both migration commands separately.
+- If EF Core reports a migration mismatch after the .NET 10 upgrade, drop and recreate the database from scratch.

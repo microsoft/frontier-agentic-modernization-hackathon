@@ -18,43 +18,43 @@ Authentication to Azure OpenAI uses **Managed Identity** — no API keys anywher
 
 ## Description
 
-### Infrastructure (Terraform — `Resources/net8/infra/`)
+Your goal is to extend the eShopOnWeb Catalog management flow with an AI-assisted product content workflow. Rather than following a prescriptive implementation guide, use **GitHub Copilot** to generate and execute an implementation plan from a clear prompt.
 
-- Add an `azurerm_cognitive_account` resource of kind `OpenAI`
-- Add an `azurerm_cognitive_deployment` for `gpt-4.1-mini` (vision-capable)
-- Grant the **Web Container App's system-assigned managed identity** the `Cognitive Services OpenAI User` role
-- Expose two new env vars to the Web app:
-  - `AzureOpenAI__Endpoint` → the OpenAI account endpoint
-  - `AzureOpenAI__Deployment` → the deployment name (`gpt-4.1-mini`)
+Start by asking Copilot to inspect the workspace and produce a plan. A good starting prompt looks like this:
 
-### Application Code (`src/`)
+```text
+Infuse Azure OpenAI vision into the eShopOnWeb ASP.NET Core app. Inspect the
+workspace and produce an implementation plan.
 
-- Add `Azure.AI.OpenAI` NuGet package (v2.x) to `Infrastructure` or `Web`
-- Add a `CatalogItemAiSuggestion` DTO: `Description` (`string`), `Tags` (`IList<string>`), `AltText` (`string`)
-- Add `ICatalogItemAiService` interface and `CatalogItemAiService` implementation:
-  - Build `AzureOpenAIClient` using `DefaultAzureCredential`
-  - Send a vision chat-completion request with the uploaded image as a base64 `data:` URI
-  - Use `ChatResponseFormat.CreateJsonObjectFormat()` for structured JSON output
-  - Return `null` on any failure — **the AI step must never block the image upload**
-- Register the service in `Program.cs` (singleton)
-- Update **Catalog Item Create/Edit** admin actions:
-  - After Blob Storage upload succeeds, call `ICatalogItemAiService.AnalyzeAsync(...)`
-  - Stash the suggestion in `TempData["AiSuggestion"]`
-  - Pre-fill `Description` if empty
-- Update **Create/Edit Razor views** to render a "Review AI suggestions" panel when `TempData["AiSuggestion"]` is present
-- Update the **Product Detail** view to use `Model.AltText` in `<img alt="...">`
+Feature: when an admin uploads a product image on the Catalog Item Create/Edit
+pages, the application calls Azure OpenAI gpt-4.1-mini (vision) and receives:
+- A short product description suitable for the store listing.
+- A list of suggested tags (e.g. ".NET clothing", "developer gear").
+- An accessible alt text rendered on the product detail page.
+
+The admin can review, accept, or regenerate the AI suggestions before saving.
+
+Hard requirements:
+1. Authenticate with Managed Identity — no API keys anywhere.
+2. No hard-coded values in code, config files, or environment variables.
+3. The AI call must not be critical: a failure must never block saving the product.
+```
+
+Review the generated plan with your team before executing it. Discuss the infrastructure changes (Azure OpenAI resource, role assignment, Container App env vars) and the application changes (service layer, model updates, UI panels). Once you're satisfied, ask Copilot to execute the plan.
+
+> **Stretch:** As an additional stretch goal, consider migrating the `BlazorAdmin` standalone WebAssembly project to the new **Blazor Web App** interactive model introduced in .NET 8 and refined in .NET 10, enabling server-side pre-rendering and faster initial load.
 
 ## Success Criteria
 
 To complete this challenge, demonstrate:
 
-1. `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a `Cognitive Services OpenAI User` role for the Web app's managed identity
-2. The Container App has `AzureOpenAI__Endpoint` and `AzureOpenAI__Deployment` env vars and **no OpenAI key**
-3. Uploading a product image triggers a successful vision completion call (visible in Azure OpenAI metrics or App Insights)
-4. The "Review AI suggestions" panel renders a description, tags, and alt text
-5. The product detail page renders the saved `AltText` in `<img alt>`
-6. If the Azure OpenAI endpoint is unreachable, the upload still succeeds and the item is saved without AI fields
-7. **Explain to your coach** — why is the AI service call wrapped in `try/catch` and must never throw? What UX principle does this reflect?
+1. An Azure OpenAI resource and a `gpt-4.1-mini` deployment are provisioned, and the Web Container App's managed identity has the appropriate role to use it
+2. The Web Container App is configured with the OpenAI endpoint and deployment name — and contains **no** API key anywhere (verify in the Azure Portal)
+3. Uploading a product image triggers a successful vision completion call (visible in Azure OpenAI metrics or App Insights dependency tracking)
+4. The "Review AI suggestions" panel renders a description, tags, and alt text. The admin can accept (data is persisted) or regenerate
+5. The product detail page renders the saved `AltText` in the `<img alt>` attribute
+6. If the Azure OpenAI endpoint is unreachable, the upload still succeeds and the item is saved without AI fields (graceful degradation)
+7. **Explain to your coach** — why must the AI service call never throw and never block the product save? What UX principle does this reflect?
 
 ## Learning Resources
 
@@ -67,7 +67,6 @@ To complete this challenge, demonstrate:
 
 ## Tips
 
-- Fetch the image bytes from Blob Storage using `BlobClient.DownloadContentAsync()` and convert to a `data:image/...;base64,...` URI for the vision API.
-- Instruct the model in the system prompt to return valid JSON matching your DTO shape — without this it may wrap the JSON in markdown code fences.
-- Wrap the entire AI call in `try/catch(Exception ex)`, log with `ILogger.LogWarning(ex, ...)`, and return `null`. The product save must proceed unconditionally.
-- Role assignment propagation can take several minutes — if you get `401` immediately, wait before debugging the code.
+- Craft your prompt carefully — the more clearly you describe the feature requirements and hard constraints, the better the plan Copilot produces. Iterate on the prompt if the initial plan misses something.
+- When reviewing the plan, pay attention to how Copilot proposes to handle the AI call failure case. The product save flow must remain resilient.
+- Role assignment propagation can take several minutes — if you get `401` immediately after deployment, wait before debugging the code.

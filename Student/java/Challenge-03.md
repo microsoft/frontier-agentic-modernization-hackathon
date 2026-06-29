@@ -19,8 +19,8 @@ Containerize and deploy the modernized Java PhotoAlbum application to Azure:
   - Azure Blob Storage account and container
 
 **Deployment steps:**
-- Build and push the container image to Azure Container Registry (or GitHub Container Registry)
-- Apply the Terraform configuration: `terraform init && terraform apply`
+- Build and push the container image to a container registry (Azure Container Registry or GitHub Container Registry)
+- Apply the Terraform configuration to provision the infrastructure
 - Verify that the deployed application is reachable via its Azure Container Apps URL
 - Confirm that photos can be uploaded and retrieved against all Azure services
 
@@ -28,10 +28,10 @@ Containerize and deploy the modernized Java PhotoAlbum application to Azure:
 
 To complete this challenge successfully, demonstrate:
 
-1. The container image builds successfully with `docker build`
-2. `terraform apply` completes without errors
+1. The container image builds successfully and is pushed to a container registry
+2. The Terraform configuration applies without errors and all resources are provisioned
 3. The Java PhotoAlbum app is accessible at its Azure Container Apps URL and photos can be uploaded and viewed
-4. Azure Portal shows active connections from the Container App to Azure Database for PostgreSQL and Azure Blob Storage
+4. The deployed application can successfully read and write to both Azure Database for PostgreSQL and Azure Blob Storage
 5. No Oracle dependencies remain anywhere in the infrastructure
 6. **Explain to your coach** — why must connection strings and credentials never be baked into the container image? How does your Terraform configuration handle secret injection at runtime?
 
@@ -46,6 +46,6 @@ To complete this challenge successfully, demonstrate:
 ## Tips
 
 - Azure Container Apps can pull images directly from a registry. Make sure your Container App is configured with the correct registry credentials or uses Managed Identity for ACR access.
-- Use Terraform `output` values to retrieve the Container App URL after `terraform apply`.
+- After applying your Terraform configuration, check the outputs to retrieve the Container App URL.
 - Connection strings for Azure services should be passed to the Container App as **environment variables** or **secrets** — do not hard-code them in the container image.
 

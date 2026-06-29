@@ -35,22 +35,7 @@ Modernize the eShopOnWeb solution to .NET 10:
 
 ### Step 1 — Run the automated migration tools
 
-```bash
-cd Student/Resources/net8/eShopOnWeb
-
-# Generate and execute a modernization plan
-modernize plan create --goal "Migrate eShopOnWeb from ASP.NET Core 8.0 to .NET 10. \
-  Update global.json to target the .NET 10 SDK. \
-  Update Directory.Packages.props TargetFramework to net10.0 and bump all package \
-  versions to their .NET 10-compatible equivalents. \
-  Replace Swashbuckle.AspNetCore with Microsoft.AspNetCore.OpenApi in PublicApi."
-```
-
-> **How `plan create` and `plan execute` are connected:** `modernize plan create` analyses the assessment output and saves a structured plan to `.github/modernize/modernization-plan/plan.md` inside the application folder. You can open that file to review every task the tool intends to perform before committing. `modernize plan execute` reads that same file — there is no plan ID or path to pass. Both commands must be run **from inside the application folder**.
-
-```bash
-modernize plan execute
-```
+Use the GitHub Copilot Modernization tool to generate and execute a migration plan. Craft a clear goal describing the upgrade objectives (TFM bump, package updates, Swashbuckle replacement) and review the generated plan before executing it.
 
 ### Step 2 — Manual fixes
 
@@ -66,23 +51,18 @@ After `modernize plan execute`, resolve remaining issues:
 
 ### Step 3 — Verify
 
-```bash
-dotnet build eShopOnWeb.sln
-dotnet run --project src/Web/Web.csproj
-# In a second terminal:
-dotnet run --project src/PublicApi/PublicApi.csproj
-```
+Build the solution and start both `Web` and `PublicApi` to confirm the migration succeeded. The store home page and the OpenAPI (Scalar) endpoint should both be accessible.
 
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
 
-1. `dotnet build eShopOnWeb.sln` succeeds with **zero errors** targeting `net10.0`
-2. `dotnet run` starts the `Web` project — the store home page loads at `https://localhost:5001/`
-3. `dotnet run` starts `PublicApi` — the OpenAPI/Scalar endpoint is accessible (not Swagger UI)
+1. The solution builds successfully with zero errors targeting `net10.0`
+2. The `Web` project starts and the store home page loads
+3. The `PublicApi` project starts and the OpenAPI/Scalar endpoint is accessible (not Swagger UI)
 4. `global.json` shows `"version": "10.0.x"`
 5. `Directory.Packages.props` shows `<TargetFramework>net10.0</TargetFramework>` and no `8.0.x` versions remain
-6. No `Swashbuckle` references exist anywhere in the solution: `grep -r Swashbuckle src/` returns nothing
+6. No `Swashbuckle` references exist anywhere in the solution
 7. *(Stretch)* The `BlazorAdmin` app loads in the browser at `https://localhost:5001/admin` — if WASM package versions are blocking progress, move on and revisit at the end
 8. **Explain to your coach** — why was Swashbuckle removed from ASP.NET Core default templates in .NET 9, and what does `MapOpenApi()` do differently from the old `UseSwagger()` middleware?
 9. **Explain to your coach** — what does `ManagePackageVersionsCentrally` in `Directory.Packages.props` mean, and why does it make the .NET 10 upgrade both convenient and risky?
@@ -92,15 +72,14 @@ To complete this challenge successfully, demonstrate:
 - [Migrate from ASP.NET Core 8.0 to 9.0](https://learn.microsoft.com/aspnet/core/migration/80-to-90)
 - [Migrate from ASP.NET Core 9.0 to 10.0](https://learn.microsoft.com/aspnet/core/migration/90-to-100)
 - [OpenAPI in ASP.NET Core 9+](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/aspnetcore-openapi)
-- [Scalar for .NET OpenAPI](https://scalar.com/blog/scalar-dotnet)
+- [Scalar.AspNetCore — .NET integration](https://github.com/scalar/scalar/blob/main/packages/scalar.aspnetcore/README.md)
 - [EF Core 10 breaking changes](https://learn.microsoft.com/ef/core/what-is-new/ef-core-10.0/breaking-changes)
 - [.NET Central Package Management](https://learn.microsoft.com/nuget/consume-packages/central-package-management)
-- [Modernization CLI — plan commands](https://learn.microsoft.com/azure/developer/github-copilot-app-modernization/modernization-agent/cli-commands)
 
 ## Tips
 
 - **Start with `global.json` and `Directory.Packages.props`** — these two files control everything. Update both before touching any individual `.csproj`.
-- **Build incrementally**: run `dotnet build` after the Target Framework Moniker change to get the full error list before attempting fixes.
-- **The Swashbuckle error is not subtle** — you will see `CS0246: The type or namespace 'SwaggerGen' could not be found`. Ask GitHub Copilot Chat: "Replace Swashbuckle with Microsoft.AspNetCore.OpenApi and Scalar in this Program.cs".
+- **Build incrementally**: build the solution after the Target Framework Moniker change to get the full error list before attempting fixes.
+- **The Swashbuckle error is not subtle** — ask GitHub Copilot Chat to help replace Swashbuckle with `Microsoft.AspNetCore.OpenApi` and Scalar in `Program.cs`.
 - **BlazorAdmin** uses `Microsoft.AspNetCore.Components.WebAssembly.Authentication` — verify the WASM auth flow still works by logging into the admin panel after the package bump.
-- **`System.Text.Json` stricter nulls**: if you see `JsonException` at runtime, add `[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]` or provide non-null defaults in DTO constructors.
+- **`System.Text.Json` stricter nulls**: if you see `JsonException` at runtime, check DTO constructors for null property defaults in .NET 10.

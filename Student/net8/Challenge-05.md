@@ -24,10 +24,7 @@ This challenge closes both gaps:
 
 Move all secrets into Azure Key Vault:
 
-1. **Enable system-assigned Managed Identity** on both Container Apps:
-   ```hcl
-   identity { type = "SystemAssigned" }
-   ```
+1. **Enable system-assigned Managed Identity** on both Container Apps (update your Terraform configuration)
 2. **Grant each identity** the `Key Vault Secrets User` role on the Key Vault
 3. **Store these secrets** in Key Vault:
    - `CatalogConnectionString`
@@ -35,24 +32,12 @@ Move all secrets into Azure Key Vault:
    - `BlobStorageConnectionString`
    - `ServiceBusConnectionString`
    - `ApplicationInsightsConnectionString`
-4. **Update `Program.cs`** in both projects to load Key Vault:
-   ```csharp
-   builder.Configuration.AddAzureKeyVault(
-       new Uri(builder.Configuration["KeyVaultUrl"]!),
-       new DefaultAzureCredential());
-   ```
+4. **Update `Program.cs`** in both projects to load secrets from Key Vault at startup using `DefaultAzureCredential`
 5. **Remove all plaintext secrets** from Container App environment variables — only `KeyVaultUrl` should remain as a non-secret value
 
 ### Verify
 
-```bash
-# Confirm no plaintext secrets in Container App config
-az containerapp show -n web-app -g <rg> \
-  --query "properties.template.containers[0].env" -o table
-
-# Browse the store and place an order, then check:
-# Azure Portal → Application Insights → Transaction Search
-```
+Confirm that no plaintext connection strings appear in the Container App environment configuration (check via the Azure Portal or the Azure CLI). Then browse the store and place an order, and verify telemetry appears in Application Insights → Transaction Search.
 
 ## Success Criteria
 
@@ -60,7 +45,7 @@ To complete this challenge successfully, demonstrate:
 
 1. Application Insights **Live Metrics** shows active requests when browsing the store
 2. A distributed trace for an order placement spans both `Web` and `PublicApi` and is visible in **Transaction Search**
-3. `az containerapp show` for both apps shows **no plaintext connection strings** — only `KeyVaultUrl` and non-secret config
+3. Both Container Apps show **no plaintext connection strings** in their environment configuration — only `KeyVaultUrl` and non-secret config (verify in the Azure Portal or the Azure CLI)
 4. Both Container Apps use **system-assigned Managed Identity** (visible in Azure Portal → Container App → Identity)
 5. The application functions correctly end-to-end after the Key Vault migration
 6. **Explain to your coach** — what is `DefaultAzureCredential` and why does it work both locally (via `az login`) and in Azure Container Apps (via Managed Identity) without any code change?

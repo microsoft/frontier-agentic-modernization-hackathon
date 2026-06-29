@@ -59,5 +59,5 @@ photo storage from Oracle BLOBs to Azure Blob Storage
 
 - `mvn clean package` must succeed — this is binary (pass/fail)
 - Functional verification happens after deployment to Azure in Challenge 03 — there is no local PostgreSQL container (PostgreSQL runs on Azure)
-- `modernize assess` after migration should show no critical issues for the Spring Boot 2→3 / Java 8→21 migration — minor warnings are acceptable
+- A fresh assessment on the updated codebase should show no remaining **mandatory blockers** for the Spring Boot 2→3 / Java 8→21 migration — potential and optional issues are acceptable
 - Remind teams **not** to modify `docker-compose.yml` — the Oracle container must stay intact for the data migration in Challenge 04

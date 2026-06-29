@@ -35,19 +35,7 @@ The `Student/Resources/net8/infra/` directory contains a skeleton Terraform conf
 
 ### Part B — Containerize
 
-Update the Dockerfiles for both `Web` and `PublicApi`:
-
-```dockerfile
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-```
-
-Verify multi-stage builds work:
-
-```bash
-docker build -f src/Web/Dockerfile -t eshoponweb-web:local .
-docker build -f src/PublicApi/Dockerfile -t eshoponweb-api:local .
-```
+Update the Dockerfiles for both `Web` and `PublicApi` to use the .NET 10 base images. Verify that both multi-stage builds complete successfully.
 
 ### Part C — Deploy with Terraform
 
@@ -59,28 +47,18 @@ Complete the Terraform skeleton in `Student/Resources/net8/infra/` to provision:
 - Azure Blob Storage account + container (`product-images`)
 - Azure Service Bus namespace + queue (`orders`)
 
-```bash
-# Build and push images
-az acr build --registry <acr-name> --image eshoponweb/web:latest \
-  --file src/Web/Dockerfile .
-az acr build --registry <acr-name> --image eshoponweb/publicapi:latest \
-  --file src/PublicApi/Dockerfile .
-
-# Deploy
-cd Student/Resources/net8/infra/
-terraform init && terraform apply
-```
+Build and push both container images to the registry, then apply the Terraform configuration to provision the infrastructure.
 
 ## Success Criteria
 
 To complete this challenge successfully, demonstrate:
 
-1. Both container images build successfully with `docker build`
-2. `terraform apply` completes without errors
+1. Both container images build successfully and are pushed to the registry
+2. The Terraform configuration applies without errors and all resources are provisioned
 3. The eShopOnWeb store is accessible at its Azure Container Apps URL — product images load from Azure Blob Storage
 4. The PublicApi OpenAPI (Scalar) endpoint is accessible from its Container App URL
 5. Placing an order results in a message appearing on the `orders` Service Bus queue (visible in Azure Portal → Service Bus → queues → messages)
-6. Azure Portal shows active connections from both Container Apps to Azure SQL, Service Bus, and Blob Storage
+6. The deployed application can successfully read and write to Azure SQL, Service Bus, and Blob Storage
 7. **Explain to your coach** — why must the `ServiceBusClient` be registered as a singleton and `ServiceBusSender` be reused rather than created per-request? What resource does each allocation consume?
 
 ## Learning Resources
@@ -95,6 +73,6 @@ To complete this challenge successfully, demonstrate:
 ## Tips
 
 - The eShopOnWeb Dockerfile copies multiple project folders — ensure `COPY` paths are relative to the build context (solution root, not `src/`).
-- Use Terraform `output` values to retrieve Container App URLs after `terraform apply`.
+- After applying your Terraform configuration, check the outputs to retrieve the Container App URLs.
 - Connection strings must be passed as **env vars or secrets** in Container App config — never baked into the image.
 - Service Bus fire-and-forget: wrap `SendMessageAsync` in `try/catch` and log without re-throwing. The order must always succeed.

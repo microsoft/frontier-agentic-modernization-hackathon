@@ -12,7 +12,7 @@ A working reference implementation lives under `Coach/Solutions/java/PhotoAlbum-
 
 Cover:
 
-- **Why Managed Identity beats API keys** for Azure OpenAI: no secrets, role-based revocation, audit trail. Tie it back to Challenge-04's Key Vault + MI work.
+- **Why Managed Identity beats API keys** for Azure OpenAI: no secrets, role-based revocation, audit trail. Tie it back to Challenge-05's Key Vault + MI work.
 - **Vision chat completions structure**: a single user message whose content is a `List<ChatMessageContentItem>` with a `ChatMessageTextContentItem` (instructions) and a `ChatMessageImageContentItem` whose `imageUrl` is a base64 `data:` URI.
 - **Structured outputs** via `ChatCompletionsJsonResponseFormat`. Stress that the system prompt must contain the literal word "JSON" or the service refuses.
 - **Graceful degradation**: the AI call is non-critical. `Optional.empty()` on failure; `try/catch` around the call; `WARN` log; the upload completes.

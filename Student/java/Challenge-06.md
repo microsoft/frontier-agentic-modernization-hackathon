@@ -14,43 +14,40 @@ The application calls **Azure OpenAI `gpt-4.1-mini` (vision)** using **Managed I
 
 ## Description
 
-Extend the PhotoAlbum Java application end-to-end with vision-assisted metadata.
+Your goal is to extend the PhotoAlbum application end-to-end with vision-assisted metadata. Rather than following a prescriptive implementation guide, use **GitHub Copilot** to generate and execute an implementation plan from a clear prompt.
 
-**Infrastructure (Terraform under `Resources/java/infra/`)**
+Start by asking Copilot to inspect the workspace and produce a plan. A good starting prompt looks like this:
 
-- Add an `azurerm_cognitive_account` resource of kind `OpenAI`.
-- Add an `azurerm_cognitive_deployment` for the **`gpt-4.1-mini`** model.
-- Grant the Container App's **system-assigned managed identity** the `Cognitive Services OpenAI User` role on the OpenAI account.
-- Expose two new Container App env vars:
-  - `AZURE_OPENAI_ENDPOINT` → the OpenAI account endpoint.
-  - `AZURE_OPENAI_DEPLOYMENT` → the `gpt-4.1-mini` deployment name.
+```text
+Infuse Azure OpenAI vision into the PhotoAlbum Spring Boot app. Inspect the
+workspace and produce an implementation plan.
 
-**Application code (under `Resources/java/PhotoAlbum-Java/`)**
+Feature: every uploaded photo is auto-analyzed by Azure OpenAI **gpt-4.1-mini** (vision)
+and enriched with a short caption (under 120 characters), an accessibility
+alt-text, and 5-10 lowercase single-word tags. These render on the gallery cards and
+detail page, and the <img alt> uses the AI alt-text (falling back to the original
+filename). This will require infrastructure changes, database schema updates, and
+application code changes.
 
-- Add the **`com.azure:azure-ai-openai`** dependency to `pom.xml` (the BOM-managed `com.azure:azure-identity` is already transitively available, but add it explicitly if needed).
-- Add `caption` (`String`), `altText` (`String`), and `tags` (`String`, comma-joined for hack simplicity) to the `Photo` entity. Hibernate `ddl-auto=update` will evolve the schema.
-- Add a `PhotoAiSuggestion` DTO with `caption`, `altText`, and `List<String> tags`.
-- Add a `PhotoAiService` interface and `PhotoAiServiceImpl` implementation that:
-  - Builds an `OpenAIClient` with `OpenAIClientBuilder.credential(new DefaultAzureCredentialBuilder().build()).endpoint(endpoint).buildClient()`.
-  - Sends a chat-completion request with a vision content list (`ChatMessageTextContentItem` + `ChatMessageImageContentItem` built from a base64 `data:` URI).
-  - Asks the model for **JSON** matching `PhotoAiSuggestion` (use `ChatCompletionsJsonResponseFormat`).
-  - Returns `Optional<PhotoAiSuggestion>` — returns `Optional.empty()` on any failure.
-- Modify `PhotoServiceImpl.uploadPhoto`: after `ImageIO` dimension extraction and **before** `photoRepository.save(...)`, call `photoAiService.analyze(bytes, mimeType)` inside `try/catch`. Populate `photo.setCaption(...)`, `photo.setAltText(...)`, `photo.setTags(String.join(",", suggestion.tags()))`. Failures **must not** block the save.
-- Update `src/main/resources/templates/index.html` gallery cards: show `caption` under the filename, render tag badges, and use `altText` for the `<img alt>` attribute (fall back to `originalFileName` if null).
-- Update `src/main/resources/templates/detail.html`: add **Caption**, **Alt text**, and **Tags** rows in the info sidebar; bind `<img alt>` to `altText`.
-- Wire `azure.openai.endpoint` / `azure.openai.deployment` in `application.properties` (reading from env vars `AZURE_OPENAI_ENDPOINT` / `AZURE_OPENAI_DEPLOYMENT`).
+Hard requirements:
+1. Authenticate with Managed Identity — no API keys anywhere.
+2. No hard-coded values in code, config files, or environment variables.
+3. The AI call must not be critical: a failure must never block a photo upload.
+```
+
+Review the generated plan with your team before executing it. Discuss the infrastructure changes needed (Azure OpenAI resource, role assignment, Container App configuration) and the application changes (new service layer, entity fields, UI updates). Once you're satisfied, ask Copilot to execute the plan.
 
 ## Success Criteria
 
 To complete this challenge, demonstrate:
 
-1. `terraform apply` provisions an Azure OpenAI account, a `gpt-4.1-mini` deployment, and a `Cognitive Services OpenAI User` role assignment to the Container App's managed identity.
-2. The Container App has the env vars `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — and **no** OpenAI key. `az containerapp show` confirms.
-3. Uploading a photo persists a non-null `caption`, an `altText`, and **at least 3 tags** in PostgreSQL. Run a quick `SELECT id, caption, alt_text, tags FROM photos ORDER BY uploaded_at DESC LIMIT 1;` to confirm.
-4. The gallery page (`/`) renders caption + tag badges on each card.
-5. The detail page renders caption, alt text, and tags in the sidebar; the `<img alt>` attribute reflects the AI-generated alt text (inspect element to verify).
-6. Disabling the Azure OpenAI account or removing the role still allows a photo to be uploaded — only the AI fields are missing. App logs show a `WARN` for the failed call.
-7. **Explain to your coach** — why must the AI service call be wrapped in `try/catch` and must never block the upload? What user-experience principle does this reflect?
+1. An Azure OpenAI resource and a vision-capable model deployment are provisioned, and the Container App's managed identity has been granted the appropriate role to use it
+2. The Container App is configured with the OpenAI endpoint and deployment name — and contains **no** API key anywhere (verify in the Azure Portal)
+3. Uploading a photo persists a non-null caption, alt-text, and at least 3 tags — confirm by querying the database or inspecting the response
+4. The gallery page renders caption and tag badges on each card
+5. The detail page renders caption, alt-text, and tags in the sidebar; the `<img alt>` attribute reflects the AI-generated alt-text (inspect element to verify)
+6. Disabling the Azure OpenAI account or removing the role assignment still allows a photo to be uploaded — only the AI fields are missing, and the application logs a warning for the failed call
+7. **Explain to your coach** — why must the AI service call never block the photo upload? What user-experience principle does this reflect?
 
 ## Learning Resources
 
@@ -60,11 +57,10 @@ To complete this challenge, demonstrate:
 - [Structured outputs with JSON response format](https://learn.microsoft.com/azure/ai-services/openai/how-to/structured-outputs)
 - [`Cognitive Services OpenAI User` role](https://learn.microsoft.com/azure/ai-services/openai/how-to/role-based-access-control)
 - [`DefaultAzureCredential` — Java](https://learn.microsoft.com/azure/developer/java/sdk/identity-azure-hosted-auth)
-- [`azurerm_cognitive_account`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_account) and [`azurerm_cognitive_deployment`](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cognitive_deployment) Terraform resources
 
 ## Tips
 
-- The Java Azure OpenAI SDK takes the image as a `ChatMessageImageContentItem` constructed from a `ChatMessageImageUrl`. Build the URL string as `"data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(bytes)`. This works without making the image publicly addressable.
-- To get reliable JSON back, set `chatCompletionsOptions.setResponseFormat(new ChatCompletionsJsonResponseFormat())` and instruct the model in the system prompt to emit a JSON object matching your DTO. Mention the word "JSON" in the system prompt — the SDK and service both require it.
-- Wrap the AI call in `try/catch (Exception e)` and `logger.warn(...)`. If Azure OpenAI is throttled or unreachable, the upload must still succeed — the photo just gets saved without AI fields. Add a `POST /photo/{id}/reanalyze` endpoint as an optional backfill action.
+- Craft your prompt carefully — the more clearly you describe the feature requirements and hard constraints, the better the plan Copilot produces. Iterate on the prompt if the initial plan misses something.
+- When reviewing the plan, pay attention to how Copilot proposes to handle the AI call failure case. The upload flow must remain resilient.
+- The AI enrichment runs at upload time, but you may also want to consider a way to re-analyze existing photos that were uploaded before the feature was added.
 

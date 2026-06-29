@@ -28,7 +28,7 @@ Perform a complete offline database migration from the legacy ContosoUniversity 
 
 **Validation**
 
-- After the migration completes, connect to the Azure SQL target database using `sqlcmd` or the Azure Portal Query editor.
+- After the migration completes, connect to the Azure SQL target database using a SQL client tool or the Azure Portal Query editor.
 - Run row-count queries to confirm that each table's record count matches the source.
 - Run a foreign-key integrity check to confirm no orphaned records were introduced.
 - Open the deployed Container App and navigate to the Students, Courses, and Departments pages — the seed data from the legacy database should be visible.
@@ -53,7 +53,7 @@ To complete this challenge, demonstrate:
 
 - [Azure Database Migration Service overview](https://learn.microsoft.com/azure/dms/dms-overview)
 - [Tutorial: Migrate SQL Server to Azure SQL Database (offline)](https://learn.microsoft.com/azure/dms/tutorial-sql-server-to-azure-sql)
-- [Database Migration Assistant (DMA) overview](https://learn.microsoft.com/sql/dma/dma-overview)
+- [SQL Server to Azure SQL Database migration guide](https://learn.microsoft.com/data-migration/sql-server/database/guide-azure-sql-database)
 - [sqlpackage Export action (BACPAC)](https://learn.microsoft.com/sql/tools/sqlpackage/sqlpackage-export)
 - [sqlpackage Import action (BACPAC)](https://learn.microsoft.com/sql/tools/sqlpackage/sqlpackage-import)
 - [Azure SQL Database authentication modes](https://learn.microsoft.com/azure/azure-sql/database/logins-create-manage)
@@ -61,7 +61,7 @@ To complete this challenge, demonstrate:
 
 ## Tips
 
-- Run `terraform output` inside `Resources/dotnet/infra/` to retrieve the Azure SQL Server FQDN and database name provisioned in Challenge 03.
+- Your Challenge 03 Terraform outputs contain the Azure SQL Server FQDN and database name you need — check the `infra/` directory outputs.
 - LocalDB uses a named pipe transport rather than TCP/IP, which can prevent the DMS Integration Runtime from connecting directly. If the DMS migration agent cannot reach LocalDB, use the `sqlpackage` CLI as a fallback: export a `.bacpac` from LocalDB, then import it into Azure SQL Database.
 - If the target database already contains tables or rows (from a previous `Database.Migrate()` run), truncate the target tables before starting the DMS migration, or enable the "overwrite existing data" option in the wizard to avoid duplicate-key errors.
 - The `dbo.__EFMigrationsHistory` table tracks which EF Core migrations have been applied. Include it in the DMS table selection so the application does not try to re-run migrations on the already-populated database.

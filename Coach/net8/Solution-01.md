@@ -12,12 +12,12 @@ This challenge establishes that even a "modern" ASP.NET Core 8 application needs
 
 | Finding | Severity | Auto-fixable? |
 |---------|----------|---------------|
-| `Swashbuckle.AspNetCore` not compatible with .NET 9+ templates | Critical | No — requires manual replacement |
-| `<TargetFramework>net8.0</TargetFramework>` in `Directory.Packages.props` | Critical | Yes — `modernize plan execute` can bump this |
-| `global.json` SDK pinned to `8.0.x` | Critical | Yes |
-| `Microsoft.AspNetCore.Components.WebAssembly` at `8.0.x` | Warning | Yes |
-| EF Core `8.0.x` packages across Infrastructure | Warning | Yes |
-| `Ardalis.Specification` at `8.0.0` (pre-.NET 10 tested) | Warning | Partial |
+| `Swashbuckle.AspNetCore` not compatible with .NET 9+ templates | Mandatory | No — requires manual replacement |
+| `<TargetFramework>net8.0</TargetFramework>` in `Directory.Packages.props` | Mandatory | Yes — `modernize plan execute` can bump this |
+| `global.json` SDK pinned to `8.0.x` | Mandatory | Yes |
+| `Microsoft.AspNetCore.Components.WebAssembly` at `8.0.x` | Potential | Yes |
+| EF Core `8.0.x` packages across Infrastructure | Potential | Yes |
+| `Ardalis.Specification` at `8.0.0` (pre-.NET 10 tested) | Potential | Partial |
 
 ## Mini-Lecture Talking Points (5 min before challenge)
 

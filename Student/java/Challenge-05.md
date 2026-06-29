@@ -30,14 +30,14 @@ To complete this challenge successfully, demonstrate:
 
 1. Application Insights shows live telemetry (requests, dependencies, exceptions) from the Java application
 2. No connection strings or credentials appear in any application config file, environment variable, or Terraform state
-3. `az keyvault secret list` shows all connection strings stored in Key Vault
+3. All connection strings are stored as secrets in Key Vault (verify via the Azure Portal or the Azure CLI)
 4. The Container App uses Managed Identity (confirm in Azure Portal → Container App → Identity)
 5. **Explain to your coach** — what does Managed Identity eliminate compared to storing a connection string in `application.properties`? What attack vector does it close?
 
 ## Learning Resources
 
 - [Azure Application Insights for Spring Boot](https://learn.microsoft.com/azure/azure-monitor/app/java-in-process-agent)
-- [Azure Key Vault with Managed Identity](https://learn.microsoft.com/azure/key-vault/general/managed-identity)
+- [Azure Key Vault with Managed Identity (RBAC guide)](https://learn.microsoft.com/azure/key-vault/general/rbac-guide)
 - [Azure Container Apps — use Key Vault secrets](https://learn.microsoft.com/azure/container-apps/manage-secrets)
 - [DefaultAzureCredential — Java](https://learn.microsoft.com/azure/developer/java/sdk/identity-azure-hosted-auth)
 

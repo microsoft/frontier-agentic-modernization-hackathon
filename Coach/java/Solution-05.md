@@ -15,11 +15,11 @@ Cover:
 
 ## Application Insights – Java
 
-The Java in-process agent approach (no SDK code changes required):
+The Azure Monitor OpenTelemetry Distro for Java uses auto-instrumentation via a JAR agent — no code changes to `pom.xml` or Java source are required:
 
-1. Download the agent JAR and include it in the Docker image:
+1. Download the agent JAR and include it in the Docker image. The current stable release is `3.7.8` (check [ApplicationInsights-Java releases](https://github.com/microsoft/ApplicationInsights-Java/releases) for the latest):
 ```dockerfile
-ADD https://github.com/microsoft/ApplicationInsights-Java/releases/download/3.x.x/applicationinsights-agent-3.x.x.jar /app/applicationinsights-agent.jar
+ADD https://github.com/microsoft/ApplicationInsights-Java/releases/download/3.7.8/applicationinsights-agent-3.7.8.jar /app/applicationinsights-agent.jar
 ENV JAVA_TOOL_OPTIONS="-javaagent:/app/applicationinsights-agent.jar"
 ```
 
